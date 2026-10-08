@@ -83,10 +83,10 @@
     "id": "56501300-77b7-4c4a-bdc7-fcef6ba6a03a",
     "slug": "south-axis",
     "title": "South Axis",
-    "subtitle": "Bilingual website for a structural-steel contracting company",
+    "subtitle": "",
     "client": "",
     "category": "Corporate Website",
-    "location": "Amman, Jordan",
+    "location": "",
     "completionDate": "",
     "featured": true,
     "published": true,
@@ -107,18 +107,17 @@
       "HTML",
       "CSS",
       "JavaScript",
-      "GSAP (ScrollTrigger, ScrollToPlugin)",
+      "GSAP (ScrollTrigger",
+      "ScrollToPlugin)",
       "Canvas 2D"
     ],
-    "cover": "/uploads/projects/1791489471358-e15a42583358db17.webp",
-    "gallery": [
-      "/uploads/projects/1791489471365-26b7e2388c10c875.webp"
-    ],
-    "seoTitle": "South Axis — Bilingual Steel-Construction Website | VELIX",
-    "seoDescription": "Bilingual Arabic/English website for South Axis, a structural-steel contracting company in Amman, featuring a custom animated canvas 3D steel structure.",
+    "cover": "/uploads/projects/1791492504686-7f33c2acad855e85.jpg",
+    "gallery": [],
+    "seoTitle": "South Axis",
+    "seoDescription": "A bilingual Arabic/English website for South Axis (محور الجنوب), a structural-steel contracting company in Amman, built around a custom animated 3D steel-structure graphic.",
     "sortOrder": 0,
     "createdAt": "2026-10-08T19:57:51.367Z",
-    "updatedAt": "2026-10-08T19:57:51.367Z",
+    "updatedAt": "2026-10-08T20:48:29.945Z",
     "deletedAt": null
   }
 ]
