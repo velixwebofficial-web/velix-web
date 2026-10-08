@@ -1,5 +1,38 @@
 [
   {
+    "id": "731d60a6-ceec-4205-a5cc-c846df8fddfb",
+    "slug": "velix-web-solutions-2",
+    "title": "VELIX Web Solutions",
+    "subtitle": "",
+    "client": "velix-web-solutions",
+    "category": "Company Website",
+    "location": "",
+    "completionDate": "2026-04-04",
+    "featured": false,
+    "published": true,
+    "websiteUrl": "https://velix-project-eta.vercel.app/",
+    "description": "The VELIX Web Solutions company website, designed and developed as a modern digital presence for the company.",
+    "overview": "",
+    "challenge": "VELIX Web Solutions (in-house)",
+    "solution": "",
+    "results": [],
+    "services": [
+      "Brand Website Design",
+      "Front-end Development",
+      "Responsive Design",
+      "English/Arabic Content"
+    ],
+    "technologies": [],
+    "cover": "/uploads/projects/1791492585653-f78c8e431194b9e0.png",
+    "gallery": [],
+    "seoTitle": "VELIX Web Solutions",
+    "seoDescription": "The VELIX Web Solutions company website, designed and developed as a modern digital presence for the company.",
+    "sortOrder": 0,
+    "createdAt": "2026-10-08T20:52:38.690Z",
+    "updatedAt": "2026-10-08T20:52:38.690Z",
+    "deletedAt": null
+  },
+  {
     "id": "13647d02-8ced-4e58-a5d4-6f4a130e819b",
     "slug": "kabseh",
     "title": "Kabseh (كبسة)",
