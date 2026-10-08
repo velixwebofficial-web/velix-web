@@ -3,10 +3,10 @@
     "id": "13647d02-8ced-4e58-a5d4-6f4a130e819b",
     "slug": "kabseh",
     "title": "Kabseh (كبسة)",
-    "subtitle": "Arabic marketing website for a food-delivery app in Amman",
+    "subtitle": "",
     "client": "",
     "category": "Landing Page",
-    "location": "Amman, Jordan",
+    "location": "",
     "completionDate": "",
     "featured": true,
     "published": true,
@@ -27,17 +27,16 @@
       "HTML",
       "CSS",
       "JavaScript",
-      "GSAP 3.12 (ScrollTrigger, ScrollToPlugin)"
+      "GSAP 3.12 (ScrollTrigger",
+      "ScrollToPlugin)"
     ],
-    "cover": "/uploads/projects/1791489471392-3b095acdad2c8724.webp",
-    "gallery": [
-      "/uploads/projects/1791489471398-7be8e72d8690857f.webp"
-    ],
-    "seoTitle": "Kabseh — Arabic Food-Delivery App Website | VELIX",
-    "seoDescription": "Single-page Arabic RTL marketing website for Kabseh (كبسة), a food-delivery app in Amman: categories, ordering steps, offers and sign-up sections.",
+    "cover": "/uploads/projects/1791492396600-fd63ba63d80eb6a8.png",
+    "gallery": [],
+    "seoTitle": "Kabseh (كبسة)",
+    "seoDescription": "A single-page Arabic, right-to-left marketing website for Kabseh (كبسة), a food-delivery app in Amman, with ordering steps, offers, sign-up sections for restaurants and delivery captains, and FAQs.",
     "sortOrder": 0,
     "createdAt": "2026-10-08T19:57:51.400Z",
-    "updatedAt": "2026-10-08T19:57:51.400Z",
+    "updatedAt": "2026-10-08T20:46:47.010Z",
     "deletedAt": null
   },
   {
