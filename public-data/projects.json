@@ -1,48 +1,5 @@
 [
   {
-    "id": "a0c76e8c-3fb9-49cd-a542-0da71a078350",
-    "slug": "velix-web-solutions",
-    "title": "VELIX Web Solutions",
-    "subtitle": "Company website and content management system",
-    "client": "VELIX Web Solutions (in-house)",
-    "category": "Company Website",
-    "location": "Amman, Jordan",
-    "completionDate": "",
-    "featured": true,
-    "published": true,
-    "websiteUrl": "https://velixweb.xyz",
-    "description": "The VELIX Web Solutions company website: a bilingual English/Arabic site with a scroll-driven intro, backed by an in-house admin dashboard that publishes projects and news as static files.",
-    "overview": "This is VELIX's own website. It presents the studio's services, portfolio, news and contact options in English and Arabic, and includes a quote request flow and an AI chat assistant.",
-    "challenge": "",
-    "solution": "The public site is static HTML, CSS and JavaScript with GSAP animation. Content is managed in an in-house admin dashboard running on Node.js with a SQLite database; on every change the admin regenerates static JSON data files and a sitemap, so the public site can be served from any static host without a running backend.",
-    "results": [],
-    "services": [
-      "Brand website design",
-      "Front-end development",
-      "Bilingual English/Arabic content",
-      "Admin dashboard and publishing pipeline",
-      "SEO setup (sitemap, metadata)"
-    ],
-    "technologies": [
-      "HTML",
-      "CSS",
-      "JavaScript",
-      "GSAP (ScrollTrigger)",
-      "Node.js",
-      "SQLite"
-    ],
-    "cover": "/uploads/projects/1791489471413-f4c7003ae8f8deef.webp",
-    "gallery": [
-      "/uploads/projects/1791489471420-a44b153462afd430.webp"
-    ],
-    "seoTitle": "VELIX Web Solutions — Company Website & CMS | VELIX",
-    "seoDescription": "VELIX Web Solutions' own bilingual company website with a scroll-driven intro and an in-house admin dashboard that publishes content as static files.",
-    "sortOrder": 0,
-    "createdAt": "2026-10-08T19:57:51.422Z",
-    "updatedAt": "2026-10-08T19:57:51.422Z",
-    "deletedAt": null
-  },
-  {
     "id": "13647d02-8ced-4e58-a5d4-6f4a130e819b",
     "slug": "kabseh",
     "title": "Kabseh (كبسة)",
