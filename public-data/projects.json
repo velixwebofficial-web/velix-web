@@ -8,7 +8,7 @@
     "category": "Company Website",
     "location": "",
     "completionDate": "2026-04-04",
-    "featured": false,
+    "featured": true,
     "published": true,
     "websiteUrl": "https://velix-project-eta.vercel.app/",
     "description": "The VELIX Web Solutions company website, designed and developed as a modern digital presence for the company.",
@@ -29,7 +29,7 @@
     "seoDescription": "The VELIX Web Solutions company website, designed and developed as a modern digital presence for the company.",
     "sortOrder": 0,
     "createdAt": "2026-10-08T20:52:38.690Z",
-    "updatedAt": "2026-10-08T20:52:38.690Z",
+    "updatedAt": "2026-10-08T20:53:12.818Z",
     "deletedAt": null
   },
   {
