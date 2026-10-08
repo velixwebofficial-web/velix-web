@@ -1,1 +1,168 @@
-[]
+[
+  {
+    "id": "a0c76e8c-3fb9-49cd-a542-0da71a078350",
+    "slug": "velix-web-solutions",
+    "title": "VELIX Web Solutions",
+    "subtitle": "Company website and content management system",
+    "client": "VELIX Web Solutions (in-house)",
+    "category": "Company Website",
+    "location": "Amman, Jordan",
+    "completionDate": "",
+    "featured": true,
+    "published": true,
+    "websiteUrl": "https://velixweb.xyz",
+    "description": "The VELIX Web Solutions company website: a bilingual English/Arabic site with a scroll-driven intro, backed by an in-house admin dashboard that publishes projects and news as static files.",
+    "overview": "This is VELIX's own website. It presents the studio's services, portfolio, news and contact options in English and Arabic, and includes a quote request flow and an AI chat assistant.",
+    "challenge": "",
+    "solution": "The public site is static HTML, CSS and JavaScript with GSAP animation. Content is managed in an in-house admin dashboard running on Node.js with a SQLite database; on every change the admin regenerates static JSON data files and a sitemap, so the public site can be served from any static host without a running backend.",
+    "results": [],
+    "services": [
+      "Brand website design",
+      "Front-end development",
+      "Bilingual English/Arabic content",
+      "Admin dashboard and publishing pipeline",
+      "SEO setup (sitemap, metadata)"
+    ],
+    "technologies": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "GSAP (ScrollTrigger)",
+      "Node.js",
+      "SQLite"
+    ],
+    "cover": "/uploads/projects/1791489471413-f4c7003ae8f8deef.webp",
+    "gallery": [
+      "/uploads/projects/1791489471420-a44b153462afd430.webp"
+    ],
+    "seoTitle": "VELIX Web Solutions — Company Website & CMS | VELIX",
+    "seoDescription": "VELIX Web Solutions' own bilingual company website with a scroll-driven intro and an in-house admin dashboard that publishes content as static files.",
+    "sortOrder": 0,
+    "createdAt": "2026-10-08T19:57:51.422Z",
+    "updatedAt": "2026-10-08T19:57:51.422Z",
+    "deletedAt": null
+  },
+  {
+    "id": "13647d02-8ced-4e58-a5d4-6f4a130e819b",
+    "slug": "kabseh",
+    "title": "Kabseh (كبسة)",
+    "subtitle": "Arabic marketing website for a food-delivery app in Amman",
+    "client": "",
+    "category": "Landing Page",
+    "location": "Amman, Jordan",
+    "completionDate": "",
+    "featured": true,
+    "published": true,
+    "websiteUrl": "https://kabseh.vercel.app",
+    "description": "A single-page Arabic, right-to-left marketing website for Kabseh (كبسة), a food-delivery app in Amman, with ordering steps, offers, sign-up sections for restaurants and delivery captains, and FAQs.",
+    "overview": "Kabseh (كبسة) is a food-delivery app in Amman, Jordan. VELIX designed and developed a single-page Arabic website for the app, covering food categories, how ordering works, why to choose the app, current offers, \"join us\" sections for restaurants and delivery captains, frequently asked questions and app download links.",
+    "challenge": "",
+    "solution": "A right-to-left Arabic layout built as a single static page, with scroll-triggered and pointer-driven GSAP animation, optimized WebP imagery and a responsive design for desktop and mobile. The \"join us\" forms are not yet connected to a backend.",
+    "results": [],
+    "services": [
+      "UI design",
+      "Front-end development",
+      "Arabic RTL layout",
+      "Motion and scroll animation",
+      "Image optimization (WebP)"
+    ],
+    "technologies": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "GSAP 3.12 (ScrollTrigger, ScrollToPlugin)"
+    ],
+    "cover": "/uploads/projects/1791489471392-3b095acdad2c8724.webp",
+    "gallery": [
+      "/uploads/projects/1791489471398-7be8e72d8690857f.webp"
+    ],
+    "seoTitle": "Kabseh — Arabic Food-Delivery App Website | VELIX",
+    "seoDescription": "Single-page Arabic RTL marketing website for Kabseh (كبسة), a food-delivery app in Amman: categories, ordering steps, offers and sign-up sections.",
+    "sortOrder": 0,
+    "createdAt": "2026-10-08T19:57:51.400Z",
+    "updatedAt": "2026-10-08T19:57:51.400Z",
+    "deletedAt": null
+  },
+  {
+    "id": "4aab829d-bd52-4bde-8710-04c74fb5b7ca",
+    "slug": "jaml",
+    "title": "Jaml (جمل)",
+    "subtitle": "Arabic marketing website for a Jordanian food-delivery app",
+    "client": "",
+    "category": "Landing Page",
+    "location": "Amman, Jordan",
+    "completionDate": "",
+    "featured": true,
+    "published": true,
+    "websiteUrl": "https://jaml-bay.vercel.app",
+    "description": "An Arabic, right-to-left marketing website for Jaml (جمل), a Jordanian food-delivery app, presenting how ordering works, app features, partner-restaurant information and FAQs.",
+    "overview": "Jaml (جمل) is a food-delivery app operating in Jordan. VELIX built a one-page Arabic website for the app that walks visitors through food categories, the ordering steps, the app's main features, a section for partner restaurants, frequently asked questions and contact details, with links to the app on the App Store and Google Play.",
+    "challenge": "",
+    "solution": "A fully right-to-left Arabic layout with self-hosted Arabic web fonts, smooth scrolling and scroll-triggered animation, and a responsive design for desktop and mobile. The contact form opens the visitor's email app (mailto). The site is static, with no backend.",
+    "results": [],
+    "services": [
+      "UI design",
+      "Front-end development",
+      "Arabic RTL layout",
+      "Motion and scroll animation",
+      "Responsive layout"
+    ],
+    "technologies": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "GSAP (ScrollTrigger, ScrollToPlugin)",
+      "Lenis"
+    ],
+    "cover": "/uploads/projects/1791489471377-81642e81207787d2.png",
+    "gallery": [],
+    "seoTitle": "Jaml — Arabic Food-Delivery App Website | VELIX",
+    "seoDescription": "Arabic RTL marketing website for Jaml (جمل), a Jordanian food-delivery app: ordering steps, app features, partner restaurants and FAQs.",
+    "sortOrder": 0,
+    "createdAt": "2026-10-08T19:57:51.383Z",
+    "updatedAt": "2026-10-08T19:57:51.383Z",
+    "deletedAt": null
+  },
+  {
+    "id": "56501300-77b7-4c4a-bdc7-fcef6ba6a03a",
+    "slug": "south-axis",
+    "title": "South Axis",
+    "subtitle": "Bilingual website for a structural-steel contracting company",
+    "client": "",
+    "category": "Corporate Website",
+    "location": "Amman, Jordan",
+    "completionDate": "",
+    "featured": true,
+    "published": true,
+    "websiteUrl": "https://south-axis.vercel.app",
+    "description": "A bilingual Arabic/English website for South Axis (محور الجنوب), a structural-steel contracting company in Amman, built around a custom animated 3D steel-structure graphic.",
+    "overview": "South Axis (محور الجنوب) is a contracting company in Amman, Jordan, working in modern steel buildings and structural steel. VELIX designed and developed the company's website: a single-page bilingual experience presenting the company, its services and its contact details.",
+    "challenge": "",
+    "solution": "The site switches between Arabic (RTL) and English (LTR) with an in-page language toggle. Its hero is a custom steel-structure animation drawn on HTML canvas with a hand-written 3D projection (no 3D library), paired with scroll-triggered GSAP animation and a scroll progress indicator. The layout is fully responsive for desktop and mobile.",
+    "results": [],
+    "services": [
+      "UI design",
+      "Front-end development",
+      "Bilingual Arabic/English build (RTL/LTR)",
+      "Custom canvas animation",
+      "Responsive layout"
+    ],
+    "technologies": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "GSAP (ScrollTrigger, ScrollToPlugin)",
+      "Canvas 2D"
+    ],
+    "cover": "/uploads/projects/1791489471358-e15a42583358db17.webp",
+    "gallery": [
+      "/uploads/projects/1791489471365-26b7e2388c10c875.webp"
+    ],
+    "seoTitle": "South Axis — Bilingual Steel-Construction Website | VELIX",
+    "seoDescription": "Bilingual Arabic/English website for South Axis, a structural-steel contracting company in Amman, featuring a custom animated canvas 3D steel structure.",
+    "sortOrder": 0,
+    "createdAt": "2026-10-08T19:57:51.367Z",
+    "updatedAt": "2026-10-08T19:57:51.367Z",
+    "deletedAt": null
+  }
+]
