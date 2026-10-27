@@ -708,3 +708,27 @@ html[lang="ar"] .velix-chat { font-family: var(--ar-text); }
 .velix-bubble.is-bot { background: var(--alu-lo); }
 .velix-lightbox-close, .velix-lightbox-nav { background: var(--graphite); color: var(--alu); }
 .pgv-nav { background: rgba(5,5,6,0.7); color: var(--graphite); border: 1px solid var(--rule-strong); }
+
+/* ==========================================================================
+   v7 brand layer — Royal Blue is the one light source on the night page.
+   Blue only ever means "act here" (buttons, links in focus, active state)
+   or "light" (glows in cinematic scenes). Everything else stays silver.
+   ========================================================================== */
+:root {
+  --blue: #1D4EFF;
+  --blue-hi: #3D68FF;
+  --blue-glow: rgba(29, 78, 255, 0.45);
+  --blue-soft: rgba(29, 78, 255, 0.12);
+}
+::selection { background: var(--blue); color: #fff; }
+:focus-visible { outline-color: var(--blue-hi); }
+.btn-primary, .btn-quote, .btn-accent { background: var(--blue); color: #fff; box-shadow: 0 0 0 0 var(--blue-glow); transition: background-color .2s, box-shadow .35s var(--ease), transform .35s var(--ease); }
+.btn-primary:hover, .btn-quote:hover, .btn-accent:hover { background: var(--blue-hi); color: #fff; box-shadow: 0 10px 40px -8px var(--blue-glow); }
+.btn-primary:active, .btn-quote:active { transform: translateY(1px); }
+.nav-links a.active::after { background: var(--blue); }
+.lang-seg-btn.is-active { text-decoration-color: var(--blue); }
+.process-step { border-top-color: var(--blue); }
+.velix-chat-toggle { background: var(--blue); color: #fff; }
+.footer-grid { grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 0.8fr)); }
+@media (max-width: 1180px) { .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .footer-grid { grid-template-columns: 1fr 1fr; } .footer-brand { grid-column: 1 / -1; } }
