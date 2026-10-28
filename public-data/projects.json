@@ -10,13 +10,17 @@
     "completionDate": "2026-10-28",
     "featured": true,
     "published": true,
-    "websiteUrl": "",
+    "websiteUrl": "https://ameed-dun.vercel.app/",
     "description": "A concept we designed for Al Ameed Coffee to try a different kind of product page. Instead of a regular grid, you scroll through the products one at a time. Each pack slides in, the page takes on its colour, and you see the roast and whether it comes with cardamom. Built in Arabic and works on mobile.\n\nThis is our own concept and isn't affiliated with Al Ameed Coffee.",
     "overview": "",
-    "challenge": "",
-    "solution": "",
+    "challenge": "Show a range of eight similar packs without it turning into a boring grid.",
+    "solution": "One product per screen: as you scroll, each pack slides in and the whole page changes to its colour, so every product gets its moment.",
     "results": [],
-    "services": [],
+    "services": [
+      "UI Design",
+      "Front-end Development",
+      "Scroll Animation"
+    ],
     "technologies": [
       "HTML",
       "CSS",
@@ -30,7 +34,7 @@
     "seoDescription": "A concept we designed for Al Ameed Coffee to try a different kind of product page. Instead of a regular grid, you scroll through the products one at a time. Each pack slides in, the page takes on its colour, and you see the roast and whether it comes with cardamom. Built in Arabic and works on mobile.\n\nThis is our own concept and isn't affiliated with Al Ameed Coffee.",
     "sortOrder": 0,
     "createdAt": "2026-10-28T19:38:45.800Z",
-    "updatedAt": "2026-10-28T19:39:24.879Z",
+    "updatedAt": "2026-10-28T19:45:02.858Z",
     "deletedAt": null
   },
   {
