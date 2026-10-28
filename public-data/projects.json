@@ -8,7 +8,7 @@
     "category": "Self-initiated concept",
     "location": "",
     "completionDate": "2026-10-28",
-    "featured": false,
+    "featured": true,
     "published": true,
     "websiteUrl": "",
     "description": "A concept we designed for Al Ameed Coffee to try a different kind of product page. Instead of a regular grid, you scroll through the products one at a time. Each pack slides in, the page takes on its colour, and you see the roast and whether it comes with cardamom. Built in Arabic and works on mobile.\n\nThis is our own concept and isn't affiliated with Al Ameed Coffee.",
@@ -30,7 +30,7 @@
     "seoDescription": "A concept we designed for Al Ameed Coffee to try a different kind of product page. Instead of a regular grid, you scroll through the products one at a time. Each pack slides in, the page takes on its colour, and you see the roast and whether it comes with cardamom. Built in Arabic and works on mobile.\n\nThis is our own concept and isn't affiliated with Al Ameed Coffee.",
     "sortOrder": 0,
     "createdAt": "2026-10-28T19:38:45.800Z",
-    "updatedAt": "2026-10-28T19:38:45.800Z",
+    "updatedAt": "2026-10-28T19:39:24.879Z",
     "deletedAt": null
   },
   {
