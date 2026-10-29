@@ -874,7 +874,7 @@ VELIX.ready.then(function () {
             <div class="kanban-card" draggable="true" data-id="${l.id}">
               <strong>${esc(l.name || 'Unnamed lead')}</strong>
               ${esc(l.phone || l.email || '')}<br>
-              <span style="opacity:.7">${esc((l.project_details || '').slice(0, 60))}</span><br>
+              <span style="opacity:.7">${esc((l.project_details || '').slice(0, 130))}</span><br>
               <span style="opacity:.55;font-size:0.72rem">${esc(l.source || '')} · ${new Date(l.created_at).toLocaleDateString()}</span>
             </div>`).join('')}
         </div>

@@ -26,7 +26,7 @@
       greeting: "Hi! I'm the VELIX assistant. I can tell you about our work, prices and the technologies we use, or book you a free 30-minute consultation.",
       quick: ['What are your prices?', 'How many projects have you done?', 'Which technologies do you use?', 'Book a free consultation'],
       bookTitle: 'Consultation requested', bookConfirm: 'Confirm on WhatsApp', bookNote: 'Tap the button to send us the booking. We will confirm right away.',
-      methods: { video: 'Video call', phone: 'Phone call', whatsapp: 'WhatsApp call' },
+      methods: { zoom: 'Zoom', video: 'Google Meet', phone: 'Phone call', whatsapp: 'WhatsApp call' },
       quoteTitle: 'Indicative price', quoteRef: 'Ref', startingFrom: 'Starting from', perMonth: '/ month', quoteNote: 'Starting price. The final price is confirmed in writing after the free consultation.',
       human: 'Talk to the team directly:', waBtn: 'WhatsApp', callBtn: 'Call', bookBtn: 'Book a consultation',
       retry: "Sorry, I couldn't finish that reply. Please try again, or message us on WhatsApp.",
@@ -38,7 +38,7 @@
       greeting: 'أهلاً! أنا مساعد VELIX. بقدر أحكيلك عن شغلنا وأسعارنا والتقنيات اللي بنشتغل فيها، أو أحجزلك استشارة مجانية مدتها 30 دقيقة.',
       quick: ['كم الأسعار؟', 'كم مشروع اشتغلتوا؟', 'شو التقنيات اللي بتستخدموها؟', 'بدي أحجز استشارة'],
       bookTitle: 'تم طلب الاستشارة', bookConfirm: 'أكّد على واتساب', bookNote: 'اكبس الزر لتبعتلنا الحجز، وبنأكدلك فوراً.',
-      methods: { video: 'مكالمة فيديو', phone: 'مكالمة هاتفية', whatsapp: 'مكالمة واتساب' },
+      methods: { zoom: 'زوم', video: 'Google Meet', phone: 'مكالمة تلفون', whatsapp: 'مكالمة واتساب' },
       quoteTitle: 'سعر تقديري', quoteRef: 'المرجع', startingFrom: 'يبدأ من', perMonth: '/ شهرياً', quoteNote: 'هذا سعر يبدأ من. السعر النهائي بيتأكد كتابياً بعد الاستشارة المجانية.',
       human: 'احكِ مع الفريق مباشرة:', waBtn: 'واتساب', callBtn: 'اتصال', bookBtn: 'احجز استشارة',
       retry: 'آسف، ما قدرت أكمّل الرد. جرّب كمان مرة، أو راسلنا على واتساب.',
@@ -62,9 +62,10 @@
       .replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي');
   }
   function projectsAnswer() {
-    var f = siteFacts(); var n = f && f.projectCount;
-    if (lang() === 'ar') return n ? 'منشور على موقعنا حالياً <strong>' + n + '</strong> مشاريع، منها: ' + f.projects.slice(0, 4).join('، ') + '. شوفها كلها بصفحة <a href="portfolio.html">أعمالنا</a>.' : 'بتقدر تشوف مشاريعنا بصفحة <a href="portfolio.html">أعمالنا</a>.';
-    return n ? 'We currently have <strong>' + n + '</strong> projects on our site, including ' + f.projects.slice(0, 4).join(', ') + '. See them all on the <a href="portfolio.html">Portfolio page</a>.' : 'You can see our work on the <a href="portfolio.html">Portfolio page</a>.';
+    var f = siteFacts(), n = f && f.projectCount, done = CFG.projectsDone || 79;
+    var some = n ? f.projects.slice(0, 4).join(lang() === 'ar' ? '، ' : ', ') : '';
+    if (lang() === 'ar') return 'اشتغلنا <strong>أكثر من ' + done + ' مشروع</strong> من أول ما بلّشنا' + (n ? '، ومنشور منهم على موقعنا <strong>' + n + '</strong> مشاريع، منها: ' + some + '.' : '.') + ' شوفهم بصفحة <a href="portfolio.html">أعمالنا</a>.';
+    return 'We have delivered <strong>' + done + '+ projects</strong> since we started' + (n ? ', and <strong>' + n + '</strong> of them are published on our website, including ' + some + '.' : '.') + ' See them on the <a href="portfolio.html">Portfolio page</a>.';
   }
   var FAQ = [
     { k: ['price', 'cost', 'how much', 'pricing', 'budget', 'quote', 'سعر', 'اسعار', 'بكم', 'قديش', 'قداش', 'كم بكلف', 'بكلف', 'تكلف', 'كلفه', 'تكلفه', 'فلوس', 'مصاري', 'دينار', 'باقه', 'باقات'],
@@ -106,6 +107,115 @@
     return best.fn ? best.fn() : (lang() === 'ar' ? best.ar : best.en);
   }
 
+  /* ---------------- offline booking engine ----------------
+     Understands one-shot requests like "بدي موعد بكرا زوم الساعة 11" or
+     "book me Sunday at 2pm on WhatsApp", confirms the slot, then asks only
+     for what is missing (day → time → method → name → phone) and hands
+     back a WhatsApp confirmation + calendar file. Rules match booking.json. */
+  var BK = (function () {
+    var DAY_AR = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+    var DAY_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    var WD = [
+      [0, ['الاحد', 'احد', 'sunday', 'sun']], [1, ['الاثنين', 'اثنين', 'الاتنين', 'اتنين', 'تنين', 'monday', 'mon']],
+      [2, ['الثلاثاء', 'الثلاثا', 'ثلاثا', 'التلاتا', 'تلاتا', 'tuesday', 'tue']], [3, ['الاربعاء', 'الاربعا', 'اربعا', 'wednesday', 'wed']],
+      [4, ['الخميس', 'خميس', 'thursday', 'thu']], [5, ['الجمعه', 'جمعه', 'friday', 'fri']], [6, ['السبت', 'سبت', 'saturday', 'sat']]
+    ];
+    var NUMW = { 'وحده': 1, 'واحده': 1, 'ثنتين': 2, 'تنتين': 2, 'اثنتين': 2, 'ثلاث': 3, 'تلات': 3, 'اربع': 4, 'اربعه': 4, 'خمس': 5, 'خمسه': 5, 'عشر': 10, 'عشره': 10, 'حداش': 11, 'احدعش': 11, 'احدعشر': 11, 'اطنعش': 12, 'اتناعش': 12, 'ثنعش': 12, 'تنعش': 12 };
+    function digits(t) { return String(t).replace(/[٠-٩]/g, function (d) { return d.charCodeAt(0) - 1632; }).replace(/[۰-۹]/g, function (d) { return d.charCodeAt(0) - 1776; }); }
+    function N(t) { return norm(digits(t)); }
+    function has(t, list) { return list.some(function (w) { return new RegExp('(^|[^\\u0600-\\u06FFa-z])' + w + '($|[^\\u0600-\\u06FFa-z])').test(t); }); }
+    // Amman is UTC+3 all year: work in "Amman wall-clock" UTC fields
+    function nowA() { return new Date(Date.now() + 3 * 3600e3); }
+    function dayStart(offset) { var n = nowA(); return Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate() + offset); }
+    function wd(ms) { return new Date(ms).getUTCDay(); }
+    function iso(ms) { var d = new Date(ms); return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0') + '-' + String(d.getUTCDate()).padStart(2, '0'); }
+    function slotUTC(day, hour) { return day + (hour - 3) * 3600e3; }
+
+    function intent(text) {
+      var t = N(text);
+      return /(احجز|حجز|موعد|مواعيد|استشار|اجتماع|ميتنج|ميتينج|زوم|zoom|book|appoint|meeting|schedule|consult)/.test(t);
+    }
+    function parse(text, opts) {
+      opts = opts || {};
+      var t = ' ' + N(text) + ' ', out = {};
+      // day
+      if (/بعد ?بكر|بعد ?غد|after tomorrow/.test(t)) out.day = dayStart(2);
+      else if (/بكرا|بكره|بكرة|بكير بكرا|غدا|بالغد|tomorrow|tmrw/.test(t)) out.day = dayStart(1);
+      else if (/اليوم|هلا اليوم|today|tonight/.test(t)) out.day = dayStart(0);
+      else {
+        WD.forEach(function (w) {
+          if (out.day == null && has(t, w[1])) { var off = (w[0] - wd(dayStart(0)) + 7) % 7; out.day = dayStart(off); out.dayAsked = w[0]; out.sameWeekday = off === 0; }
+        });
+        var dm = /(\d{1,2})\s*[\/\-.]\s*(\d{1,2})(?:\s*[\/\-.]\s*(\d{2,4}))?/.exec(t);
+        if (out.day == null && dm) {
+          var n = nowA(), y = dm[3] ? (+dm[3] < 100 ? 2000 + +dm[3] : +dm[3]) : n.getUTCFullYear();
+          var ms = Date.UTC(y, +dm[2] - 1, +dm[1]);
+          if (!dm[3] && ms < dayStart(0)) ms = Date.UTC(y + 1, +dm[2] - 1, +dm[1]);
+          out.day = ms;
+        }
+      }
+      // time
+      var tt = t.replace(/(\d{1,2})\s*[\/\-.]\s*(\d{1,2})(\s*[\/\-.]\s*\d{2,4})?/, ' ');
+      var m = /(?:الساعه|ساعه|الساعة|ع الساعه|عالساعه|at|@)\s*(\d{1,2})(?::(\d{2}))?/.exec(tt) || /(\d{1,2}):(\d{2})/.exec(tt) || /(\d{1,2})\s*(am|pm|ص|م|الصبح|صباحا|الظهر|ظهرا|العصر|عصرا|المسا|مساء|مساءا|بالليل)/.exec(tt);
+      var h = null, min = 0;
+      if (m) { h = +m[1]; min = m[2] && /^\d+$/.test(m[2]) ? +m[2] : 0; }
+      else { Object.keys(NUMW).forEach(function (w) { if (h == null && has(tt, ['الساعه ' + w, 'ع ' + w, w + ' الصبح', w + ' العصر', w + ' المسا', w + ' الظهر'])) h = NUMW[w]; }); }
+      if (h == null && opts.awaitHour) { var lone = /^\s*(\d{1,2})\s*$/.exec(tt); if (lone) h = +lone[1]; }
+      if (h != null && h <= 24) {
+        var pm = /(pm|العصر|عصرا|المسا|مساء|بالليل|الظهر|ظهرا|\sم\s)/.test(tt), am = /(am|الصبح|صباحا|\sص\s)/.test(tt);
+        if (pm && h < 12) h += 12; else if (!am && h >= 1 && h <= 6) h += 12;
+        out.hour = h; out.minute = min;
+      }
+      // method
+      if (/زوم|zoom/.test(t)) out.method = 'zoom';
+      else if (/جوجل ميت|google meet|\bmeet\b|ميت|فيديو|video/.test(t)) out.method = 'video';
+      else if (/واتس|whats ?app/.test(t)) out.method = 'whatsapp';
+      else if (/تلفون|تليفون|هاتف|اتصال|اتصل|مكالمه عادي|phone|call me|normal call/.test(t)) out.method = 'phone';
+      // phone
+      var ph = digits(text).replace(/[\s\-()]/g, '').match(/\+?\d{7,15}/);
+      if (ph) out.phone = ph[0];
+      // name
+      var nm = /(?:اسمي|انا اسمي|my name is|this is)\s+([^\d,،.!?؟]{2,40})/i.exec(text);
+      if (nm) out.name = nm[1].trim().split(/\s+/).slice(0, 3).join(' ');
+      return out;
+    }
+    function hourLabel(h, ar) {
+      var hh = h % 12 || 12;
+      if (!ar) return hh + ':00 ' + (h < 12 ? 'AM' : 'PM');
+      return hh + ':00 ' + (h < 12 ? 'الصبح' : h < 14 ? 'الظهر' : h < 17 ? 'العصر' : 'المسا');
+    }
+    function dayLabel(day, ar) {
+      var d = wd(day), rel = (day - dayStart(0)) / 864e5;
+      var name = ar ? DAY_AR[d] : DAY_EN[d], dt = new Date(day), short = dt.getUTCDate() + '/' + (dt.getUTCMonth() + 1);
+      if (rel === 0) return (ar ? 'اليوم ' : 'today, ') + name + ' ' + short;
+      if (rel === 1) return (ar ? 'بكرا ' : 'tomorrow, ') + name + ' ' + short;
+      return name + ' ' + short;
+    }
+    // first valid hour on a day (or null)
+    function firstHour(day) { for (var h = 10; h <= 16; h++) if (slotUTC(day, h) - Date.now() >= 2 * 3600e3) return h; return null; }
+    function nextDays(n) { var out = []; for (var o = 0; o <= 14 && out.length < n; o++) { var d = dayStart(o); if (wd(d) !== 5 && firstHour(d) != null) out.push(d); } return out; }
+    function checkDay(day) {
+      if (day < dayStart(0)) return 'past';
+      if (day > dayStart(14)) return 'far';
+      if (wd(day) === 5) return 'friday';
+      if (firstHour(day) == null) return 'full';
+      return null;
+    }
+    function checkSlot(day, hour) {
+      if (hour < 10 || hour > 16) return 'hours';
+      if (slotUTC(day, hour) - Date.now() < 2 * 3600e3) return 'soon';
+      return null;
+    }
+    function ics(b) {
+      var st = new Date(slotUTC(b.day, b.hour)), en = new Date(st.getTime() + 30 * 6e4);
+      var f = function (d) { return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); };
+      var body = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//VELIX//Booking//EN', 'BEGIN:VEVENT', 'UID:' + Date.now() + '@velixweb.xyz', 'DTSTAMP:' + f(new Date()), 'DTSTART:' + f(st), 'DTEND:' + f(en),
+        'SUMMARY:VELIX — Free consultation', 'DESCRIPTION:Free 30-minute consultation with VELIX Web Solutions. WhatsApp +962799691748', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+      return 'data:text/calendar;charset=utf-8,' + encodeURIComponent(body);
+    }
+    return { intent: intent, parse: parse, hourLabel: hourLabel, dayLabel: dayLabel, nextDays: nextDays, firstHour: firstHour, checkDay: checkDay, checkSlot: checkSlot, ics: ics, iso: iso, wd: wd, dayStart: dayStart, DAY_AR: DAY_AR, DAY_EN: DAY_EN };
+  })();
+
   /* ---------------- rendering ---------------- */
   function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
   function md(text) {
@@ -133,8 +243,7 @@
     return '<div class="vc-card"><div class="vc-card__t">' + s('bookTitle') + '</div>' +
       '<div class="vc-row"><span>' + esc(day) + ' · ' + esc(b.date) + '</span><b dir="ltr">' + String(b.hour).padStart(2, '0') + ':00</b></div>' +
       '<div class="vc-row"><span>' + esc(s('methods')[b.method] || b.method) + '</span><b>' + esc(b.name) + '</b></div>' +
-      '<a class="vc-cta" href="' + esc(r.whatsappUrl) + '" target="_blank" rel="noopener">' + s('bookConfirm') + '</a>' +
-      '<p class="vc-note">' + s('bookNote') + '</p></div>';
+      '<div class="vc-ok">' + (ar ? '✓ انحجز موعدك ووصلنا' : '✓ Booked — we have it') + '</div></div>';
   }
   function quoteCard(q) {
     var ar = lang() === 'ar';
@@ -205,6 +314,141 @@
       Array.prototype.forEach.call(quick.children, function (b) { b.addEventListener('click', function () { send(b.textContent); }); });
     }
 
+    /* ---------- offline booking conversation ---------- */
+    var bk = null;
+    var BT = {
+      ar: {
+        askDay: 'أكيد! 🙌 أي يوم بناسبك؟', askHour: 'وأي ساعة بتناسبك؟ مواعيدنا من <strong>10 الصبح</strong> لـ <strong>4 العصر</strong> بتوقيت عمّان.',
+        askMethod: 'كيف بتحب نحكي؟ <strong>زوم</strong>، <strong>Google Meet</strong>، <strong>تلفون</strong> ولا <strong>واتساب</strong>؟',
+        askName: 'عشان أثبتلك الموعد، شو اسمك الكريم؟', askPhone: 'تشرفنا يا <strong>{n}</strong>! شو رقم تلفونك (واتساب)؟ عشان نبعتلك التأكيد{z}.',
+        zoomLink: ' ورابط الاجتماع', badPhone: 'الرقم مش واضح معي 🙏 اكتبه أرقام بس، مثلاً <span dir="ltr">0791234567</span>.',
+        friday: 'الجمعة إجازة عنا 🙂 شو رأيك بيوم من هدول؟', past: 'هاد اليوم راح 😅 اختار يوم من هدول:', far: 'منحجز لحد أسبوعين لقدّام بس. اختار يوم أقرب:',
+        full: 'مواعيد اليوم خلصت. شو رأيك بكرا أو يوم ثاني؟', hours: 'مواعيدنا من <strong>10 الصبح</strong> لـ <strong>4 العصر</strong>. اختار ساعة من هدول:',
+        soon: 'هاد الوقت قريب كثير، لازم يكون بعد ساعتين على الأقل. أقرب موعد فاضي:', ok: 'تمام ✅', on: 'على',
+        at: 'الساعة', done: 'خلصنا! 🎉 هاي تفاصيل موعدك. اكبس <strong>أكّد على واتساب</strong> وبتوصلنا الرسالة جاهزة، ومنأكدلك بأسرع وقت.',
+        cardT: 'موعدك مع VELIX', cal: 'أضف للتقويم', cancel: 'ولا يهمك، لغيت الحجز. إذا بدك موعد بأي وقت احكيلي 👍',
+        mZoom: 'زوم', mMeet: 'Google Meet', mPhone: 'تلفون', mWa: 'واتساب', back: 'نرجع للحجز: '
+      },
+      en: {
+        askDay: 'Sure! 🙌 Which day works for you?', askHour: 'And what time suits you? We take calls from <strong>10 AM</strong> to <strong>4 PM</strong> Amman time.',
+        askMethod: 'How would you like to talk? <strong>Zoom</strong>, <strong>Google Meet</strong>, <strong>phone</strong> or <strong>WhatsApp</strong>?',
+        askName: 'To lock it in, what is your name?', askPhone: 'Nice to meet you, <strong>{n}</strong>! What is your phone (WhatsApp) number? We will send the confirmation{z} there.',
+        zoomLink: ' and the meeting link', badPhone: "I couldn't read that number 🙏 Please type digits only, e.g. <span dir=\"ltr\">0791234567</span>.",
+        friday: "We're off on Fridays 🙂 How about one of these?", past: 'That day has passed 😅 Pick one of these:', far: 'We book up to two weeks ahead. Pick a closer day:',
+        full: "Today's slots are gone. How about tomorrow or another day?", hours: 'We take calls from <strong>10 AM</strong> to <strong>4 PM</strong>. Pick a time:',
+        soon: 'That is a bit too soon — slots need to be at least 2 hours away. Nearest free time:', ok: 'Got it ✅', on: 'on',
+        at: 'at', done: "All set! 🎉 Here are your details. Tap <strong>Confirm on WhatsApp</strong> to send them to us, and we'll confirm right away.",
+        cardT: 'Your call with VELIX', cal: 'Add to calendar', cancel: 'No problem, booking cancelled. Just tell me whenever you want a slot 👍',
+        mZoom: 'Zoom', mMeet: 'Google Meet', mPhone: 'Phone', mWa: 'WhatsApp', back: 'Back to your booking: '
+      }
+    };
+    function bt(k) { return (BT[lang()] || BT.en)[k]; }
+    function mName(m) { return s('methods')[m] || m; }
+    function chips(list) {
+      quick.innerHTML = list.map(function (q) { return '<button type="button" class="vc-chip" dir="auto">' + esc(q) + '</button>'; }).join('');
+      Array.prototype.forEach.call(quick.children, function (b) { b.addEventListener('click', function () { send(b.textContent); }); });
+    }
+    function dayChips() { var ar = lang() === 'ar'; return BK.nextDays(4).map(function (d) { return BK.dayLabel(d, ar); }); }
+    function hourChips(day) {
+      var ar = lang() === 'ar', out = [], from = day != null ? BK.firstHour(day) : 10;
+      for (var h = from || 10; h <= 16; h++) out.push(BK.hourLabel(h, ar));
+      return out;
+    }
+    function methodChips() { return [bt('mZoom'), bt('mMeet'), bt('mPhone'), bt('mWa')]; }
+    function nextQuestion(prefix) {
+      prefix = prefix ? prefix + '<br>' : '';
+      if (bk.day == null) { bk.await = 'day'; chips(dayChips()); return prefix + bt('askDay'); }
+      if (bk.hour == null) { bk.await = 'hour'; chips(hourChips(bk.day)); return prefix + bt('askHour'); }
+      if (!bk.method) { bk.await = 'method'; chips(methodChips()); return prefix + bt('askMethod'); }
+      if (!bk.name) { bk.await = 'name'; quick.innerHTML = ''; return prefix + bt('askName'); }
+      if (!bk.phone) { bk.await = 'phone'; quick.innerHTML = ''; return prefix + bt('askPhone').replace('{n}', esc(bk.name)).replace('{z}', bk.method === 'zoom' || bk.method === 'video' ? bt('zoomLink') : ''); }
+      return null;
+    }
+    function summaryLine() {
+      var ar = lang() === 'ar', parts = [];
+      if (bk.day != null) parts.push('<strong>' + BK.dayLabel(bk.day, ar) + '</strong>');
+      if (bk.hour != null) parts.push(bt('at') + ' <strong dir="auto">' + BK.hourLabel(bk.hour, ar) + '</strong>');
+      if (bk.method) parts.push(bt('on') + ' <strong>' + mName(bk.method) + '</strong>');
+      return bt('ok') + ' ' + parts.join(' ');
+    }
+    var BOOK_API = (CFG.apiBase || '').replace(/\/$/, '') + '/api/bookings';
+    function finish() {
+      var b = bk; bk = null; quick.innerHTML = '';
+      return { pending: b };
+    }
+    function bookingCardHTML(b, ok) {
+      var ar = lang() === 'ar', dIso = BK.iso(b.day), wd = BK.wd(b.day);
+      var rows = '<div class="vc-row"><span>' + esc(BK.dayLabel(b.day, ar)) + '</span><b dir="auto">' + esc(BK.hourLabel(b.hour, ar)) + '</b></div>' +
+        '<div class="vc-row"><span>' + esc(mName(b.method)) + '</span><b>' + esc(b.name) + '</b></div>' +
+        '<div class="vc-row"><span>' + (ar ? 'الرقم' : 'Phone') + '</span><b dir="ltr">' + esc(b.phone) + '</b></div>';
+      var extra;
+      if (ok) {
+        extra = '<div class="vc-ok">' + (ar ? '✓ انحجز موعدك ووصلنا' : '✓ Booked — we have it') + '</div>' +
+          '<a class="vc-cal" href="' + BK.ics(b) + '" download="velix-consultation.ics">' + bt('cal') + '</a>';
+      } else {
+        var msg = ['مرحبا VELIX 👋 بدي أحجز استشارة مجانية:', 'الاسم: ' + b.name, 'الرقم: ' + b.phone,
+          'الموعد: ' + BK.DAY_AR[wd] + ' ' + dIso + ' الساعة ' + String(b.hour).padStart(2, '0') + ':00 (توقيت عمّان)', 'الطريقة: ' + (STR.ar.methods[b.method] || b.method)].join('\n');
+        extra = '<a class="vc-cta" href="https://wa.me/' + WA + '?text=' + encodeURIComponent(msg) + '" target="_blank" rel="noopener">' + (ar ? 'ابعت الحجز على واتساب' : 'Send booking on WhatsApp') + '</a>';
+      }
+      return '<div class="vc-card"><div class="vc-card__t">' + bt('cardT') + '</div>' + rows + extra + '</div>';
+    }
+    async function saveBooking(b) {
+      var body = { date: BK.iso(b.day), hour: b.hour, method: b.method, name: b.name, phone: b.phone, lang: lang(), source: 'Website Chat Booking',
+        sessionId: VELIX.session ? VELIX.session.getToken() : convId };
+      var ctl = window.AbortController ? new AbortController() : null, timer = ctl && setTimeout(function () { ctl.abort(); }, 12000);
+      try {
+        var r = await fetch(BOOK_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: ctl ? ctl.signal : undefined });
+        var data = await r.json().catch(function () { return {}; });
+        return r.ok && data.success ? { ok: true } : { ok: false, error: data.error || ('HTTP ' + r.status), invalid: r.status === 400 };
+      } catch (e) { return { ok: false, error: 'network' }; }
+      finally { if (timer) clearTimeout(timer); }
+    }
+    function looksLikeName(text) {
+      var t = text.trim();
+      return t.length >= 2 && t.length <= 40 && !/\d/.test(t) && !/[?؟]/.test(t) && t.split(/\s+/).length <= 4;
+    }
+    // returns an array of bot bubbles (html), or null if this isn't a booking turn
+    function bookingTurn(text) {
+      var starting = !bk && BK.intent(text);
+      if (!bk && !starting) return null;
+      var t = norm(text);
+      if (bk && /(الغي|الغاء|كنسل|ما بدي|خلص لا|cancel|never ?mind|forget it)/.test(t)) { bk = null; quick.innerHTML = ''; return [bt('cancel')]; }
+      if (!bk) bk = {};
+      var p = BK.parse(text, { awaitHour: bk.await === 'hour' });
+      var got = false;
+      if (bk.await === 'name' && !p.name && !p.phone && looksLikeName(text) && !p.method && p.day == null && p.hour == null && !fallbackAnswer(text)) p.name = text.trim().replace(/^(انا|أنا|اسمي)\s+/, '');
+      if (bk.await === 'phone' && !p.phone) {
+        // a question mid-booking → answer it, then come back
+        var faq = fallbackAnswer(text);
+        if (faq && !looksLikeName(text)) return [faq, bt('back') + nextQuestion('')];
+        return [bt('badPhone')];
+      }
+      ['method', 'name', 'phone'].forEach(function (k) { if (p[k]) { bk[k] = p[k]; got = true; } });
+      var problems = [];
+      if (p.day != null) {
+        var dErr = BK.checkDay(p.day);
+        if (dErr) { problems.push(bt(dErr)); bk.day = null; chips(dayChips()); }
+        else { bk.day = p.day; got = true; }
+      }
+      if (p.hour != null) { bk.hour = p.hour; got = true; }
+      if (bk.hour != null) {
+        var hErr = BK.checkSlot(bk.day != null ? bk.day : BK.dayStart(1), bk.hour);
+        if (hErr === 'hours' || (hErr === 'soon' && bk.day != null)) {
+          problems.push(bt(hErr)); bk.hour = null;
+          chips(hourChips(bk.day != null && BK.checkDay(bk.day) === null ? bk.day : null));
+          return [problems.join('<br>')];
+        }
+      }
+      if (problems.length) return [problems.join('<br>')];
+      if (!got && !starting) {
+        var f = fallbackAnswer(text);
+        if (f) { var q = nextQuestion(''); return q ? [f, bt('back') + q] : [f]; }
+      }
+      var ack = (p.day != null || p.hour != null || p.method) && (bk.day != null || bk.hour != null || bk.method) ? summaryLine() : '';
+      var q2 = nextQuestion(ack);
+      return q2 ? [q2] : finish();
+    }
+
     function fallback(text) {
       var t = typing();
       setTimeout(function () {
@@ -247,15 +491,39 @@
         if (err && err.down) aiDown = true; // only a missing/broken endpoint switches to the offline assistant
         else if (!err || err.name !== 'TypeError') { bubble(s('retry') + actionsHTML(), 'bot'); return; }
         aiDown = true;
-        fallback(text);
+        await offline(text);
       }
+    }
+
+    async function offline(text) {
+      var bb = bookingTurn(text);
+      if (!bb) return fallback(text);
+      var tp = typing();
+      if (bb.pending) {
+        var b = bb.pending, res = await saveBooking(b), ar = lang() === 'ar';
+        tp.remove();
+        if (res.ok) {
+          bb = [(ar ? 'تم! 🎉 موعدك انحجز يا <strong>' + esc(b.name) + '</strong>، وفريقنا رح يتواصل معك على <span dir="ltr">' + esc(b.phone) + '</span> قبل الموعد' + (b.method === 'zoom' || b.method === 'video' ? ' ويبعتلك رابط الاجتماع' : '') + '.'
+                 : 'Done! 🎉 You are booked, <strong>' + esc(b.name) + '</strong>. Our team will contact you on <span dir="ltr">' + esc(b.phone) + '</span> before the call' + (b.method === 'zoom' || b.method === 'video' ? ' with the meeting link' : '') + '.'), bookingCardHTML(b, true)];
+          record('[booking saved] ' + BK.iso(b.day) + ' ' + b.hour + ':00 ' + b.method + ' ' + b.name + ' ' + b.phone, 'bot');
+        } else {
+          bb = [(ar ? 'ما قدرت أثبّت الحجز من هون هلّق 🙏 اكبس الزر وبيوصلنا موعدك جاهز على واتساب.' : "I couldn't save the booking from here right now 🙏 Tap the button and it reaches us on WhatsApp."), bookingCardHTML(b, false)];
+          record('[booking NOT saved: ' + res.error + '] ' + BK.iso(b.day) + ' ' + b.hour + ':00 ' + b.name + ' ' + b.phone, 'bot');
+        }
+        bb.forEach(function (h) { bubble(h, 'bot'); });
+        return;
+      }
+      await new Promise(function (r) { setTimeout(r, 450 + Math.random() * 350); });
+      tp.remove();
+      bb.forEach(function (h) { bubble(h, 'bot'); });
+      record(bb.join(' | ').replace(/<[^>]+>/g, ''), 'bot');
     }
 
     async function send(text) {
       text = (text || '').trim(); if (!text || busy) return;
       busy = true; quick.innerHTML = '';
       bubble(esc(text), 'user'); record(text, 'user'); input.value = '';
-      if (aiDown || !CFG.aiEnabled) fallback(text); else await ai(text);
+      if (aiDown || !CFG.aiEnabled) await offline(text); else await ai(text);
       busy = false;
     }
 

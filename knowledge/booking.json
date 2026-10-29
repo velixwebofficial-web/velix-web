@@ -7,6 +7,11 @@
     "commitment": "none",
     "methods": [
       {
+        "id": "zoom",
+        "en": "Zoom meeting",
+        "ar": "اجتماع زوم"
+      },
+      {
         "id": "video",
         "en": "Video call (Google Meet)",
         "ar": "مكالمة فيديو (Google Meet)"
@@ -28,6 +33,7 @@
       "A slot must be at least 2 hours from now",
       "Bookings up to 14 days ahead",
       "The booking is confirmed when the visitor sends the WhatsApp confirmation message"
-    ]
+    ],
+    "booking_flow": "Collect day, time and method first (any order, from one message if the visitor gives them all), confirm them back warmly, then ask for the name, then the phone number, then book."
   }
 }

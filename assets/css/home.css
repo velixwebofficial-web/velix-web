@@ -252,3 +252,4 @@ html[lang="ar"] .v9-cta__title { line-height: 1.3; letter-spacing: 0; font-size:
   .v9-marquee__track, .v9-tech__track, .v9-orbit, .v9-glow { animation: none !important; }
 }
 .v9-stat b[dir="ltr"] { white-space: nowrap; font-size: clamp(1.7rem, 3.4vw, 3rem); }
+.v9-plus { font-style: normal; color: var(--blue-2); margin-inline-start: 2px; }

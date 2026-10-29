@@ -359,6 +359,8 @@ server.listen(PORT, HOST, () => {
     }
   });
 
+  try { require('./lib/inboxSync').start(); } catch (err) { console.error('  ⚠ Live-site inbox failed to start:', err.message); }
+
   if (!loadedEnvLocal) {
     console.warn('  ⚠ No .env.local found. Copy .env.example to .env.local and fill in');
     console.warn('    ADMIN_EMAIL / ADMIN_PASSWORD_HASH / ADMIN_SESSION_SECRET / ANTHROPIC_API_KEY,');

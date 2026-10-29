@@ -226,6 +226,8 @@
     var allCount = 0; try { allCount = window.VELIX.projects.all().length; } catch (e) {}
     var pc = $('#v9ProjCount');
     if (pc) { if (allCount > 0) pc.setAttribute('data-to', allCount); else pc.closest('.v9-stat').style.display = 'none'; }
+    var dc = $('#v9DoneCount'), done = (window.VELIX_CONFIG || {}).projectsDone;
+    if (dc && done) dc.setAttribute('data-to', done);
     loaded = true; buildFan(); buildWork();
   }).then(function () {
     if (G) { G.set('.v9-line > span', { clearProps: 'all' }); G.set('[data-hero]', { clearProps: 'all' }); }

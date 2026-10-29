@@ -335,7 +335,10 @@ module.exports = async (req, res) => {
     switch (resource) {
       case 'projects': data = handleProjects(action, payload); break;
       case 'news': data = handleNews(action, payload); break;
-      case 'leads': data = handleLeads(action, payload); break;
+      case 'leads':
+        // Pull any fresh bookings from the live site first, so opening Leads is always up to date
+        if (action === 'all') { try { await require('../../lib/inboxSync').syncOnce(); } catch (e) { /* offline — show what we have */ } }
+        data = handleLeads(action, payload); break;
       case 'conversations': data = handleConversations(action); break;
       case 'activity': data = handleActivity(action); break;
       case 'settings': data = handleSettings(action, payload); break;

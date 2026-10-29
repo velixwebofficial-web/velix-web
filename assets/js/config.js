@@ -8,6 +8,7 @@ window.VELIX_CONFIG = (function () {
   var local = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
   return {
     aiEnabled: local,      // ← set to true after deploying the API
-    apiBase: ''            // ← e.g. 'https://velix-api.vercel.app'
+    apiBase: '',           // ← e.g. 'https://velix-api.vercel.app'
+    projectsDone: 79       // ← total projects delivered since we started (shown as 79+)
   };
 })();

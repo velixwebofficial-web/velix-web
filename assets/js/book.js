@@ -185,16 +185,38 @@
     };
     state.lastBooking = b;
     var url = 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(buildMessage(b));
-    sendCopies(b);
-    var win = window.open(url, '_blank');
-    if (win) { try { win.opener = null; } catch (e) {} }
+    var mode = form.querySelector('input[name="mode"]:checked').value;
+    var btn = form.querySelector('.bk-submit'); btn.disabled = true;
 
-    document.getElementById('bkSumWhen').textContent = b.when;
-    document.getElementById('bkSumHow').textContent = b.how;
-    document.getElementById('bkWaAgain').href = url;
-    form.hidden = true; done.hidden = false; done.focus();
-    done.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    if (!win) window.location.href = url; // popup blocked: go straight to WhatsApp
+    function showDone(saved) {
+      document.getElementById('bkSumWhen').textContent = b.when;
+      document.getElementById('bkSumHow').textContent = b.how;
+      var wa = document.getElementById('bkWaAgain'); wa.href = url; wa.style.display = saved ? 'none' : '';
+      var h = done.querySelector('h2'), p = done.querySelector('p');
+      h.setAttribute('data-i18n', saved ? 't_v9_bk_ok_t' : 't_v7_b_done_t'); h.textContent = t(saved ? 't_v9_bk_ok_t' : 't_v7_b_done_t', saved ? 'You are booked.' : 'Almost done.');
+      p.setAttribute('data-i18n', saved ? 't_v9_bk_ok_b' : 't_v7_b_done_b'); p.textContent = t(saved ? 't_v9_bk_ok_b' : 't_v7_b_done_b', '');
+      form.hidden = true; done.hidden = false; done.focus();
+      done.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+
+    // 1) Save straight to the admin room (Leads). 2) If that is not reachable, fall back to WhatsApp.
+    var cfg = window.VELIX_CONFIG || {};
+    var api = (cfg.apiBase || '').replace(/\/$/, '') + '/api/bookings';
+    var dd = state.day;
+    fetch(api, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+      date: dd.y + '-' + pad(dd.m + 1) + '-' + pad(dd.d), hour: state.slot.h, method: mode === 'meet' ? 'video' : mode,
+      name: b.name, phone: b.phone, need: [b.need, b.business, b.email, b.notes].filter(Boolean).join(' · '), lang: lang(), source: 'Website Booking Page'
+    }) }).then(function (r) { return r.json().then(function (d) { return r.ok && d && d.success; }, function () { return false; }); })
+      .catch(function () { return false; })
+      .then(function (saved) {
+        btn.disabled = false;
+        if (saved) { showDone(true); return; }
+        sendCopies(b);
+        var win = window.open(url, '_blank');
+        if (win) { try { win.opener = null; } catch (e) {} }
+        showDone(false);
+        if (!win) window.location.href = url; // popup blocked: go straight to WhatsApp
+      });
   });
 
   document.getElementById('bkIcs').addEventListener('click', function () {
