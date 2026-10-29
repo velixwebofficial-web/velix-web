@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "last_updated": "2026-10-29",
+  "frontend": [
+    "HTML5",
+    "CSS3",
+    "JavaScript",
+    "TypeScript",
+    "React",
+    "Next.js",
+    "Tailwind CSS",
+    "GSAP (animation and scroll effects)",
+    "TanStack Query"
+  ],
+  "backend": [
+    "Node.js",
+    "REST APIs"
+  ],
+  "databases": [
+    "PostgreSQL",
+    "SQLite"
+  ],
+  "cms": [
+    "WordPress",
+    "Custom admin dashboards"
+  ],
+  "hosting_and_tools": [
+    "Vercel",
+    "GitHub"
+  ],
+  "security": [
+    "HTTPS everywhere",
+    "Hardened forms (validation, spam and injection filtering)",
+    "Rate limiting",
+    "Secure authentication and roles for admin areas",
+    "Regular updates and backups"
+  ],
+  "ai": [
+    "AI chat assistants built on Claude, like the one on this website"
+  ],
+  "languages_spoken_with_clients": [
+    "Arabic",
+    "English"
+  ],
+  "note": "Pick the stack per project; never claim a technology that is not listed here."
+}

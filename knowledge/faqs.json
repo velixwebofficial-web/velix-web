@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_updated": "2026-07-12",
+  "last_updated": "2026-10-29",
   "faqs": [
     {
       "q": "Do you offer hosting and domains?",
@@ -16,7 +16,7 @@
     },
     {
       "q": "What technology do you use?",
-      "a": "We choose the right stack per project rather than forcing one tool everywhere — typically modern HTML5/CSS3/JavaScript on the front end, and React, Node.js, or Shopify/WordPress on the back end depending on needs, with a strong focus on speed and security."
+      "a": "We choose the right stack per project rather than forcing one tool everywhere — typically modern HTML5/CSS3/JavaScript on the front end, and React, Next.js, Node.js or WordPress on the back end depending on needs, with a strong focus on speed and security."
     },
     {
       "q": "Can I see your previous work?",
@@ -24,7 +24,7 @@
     },
     {
       "q": "Who is behind VELIX?",
-      "a": "VELIX Web Solutions is led by Moatasm Abdeen (Founder & CEO). The company focuses on clean, modern websites and online stores, with pricing based on the project scope. For project-specific questions, visitors can contact hello@velixweb.xyz."
+      "a": "VELIX Web Solutions is led by Moatsm Abdeen (Founder & CEO). The company focuses on clean, modern websites and online stores, with pricing based on the project scope. For project-specific questions, visitors can contact hello@velixweb.xyz."
     }
   ]
 }

@@ -1,521 +1,276 @@
 /* ==========================================================================
-   VELIX WEB SOLUTIONS — LIVE CHAT WIDGET (AI Architecture v2)
-   A floating chat assistant that greets visitors, talks to a real Claude
-   model through the /api/chat AI gateway (see /api/chat.js and /lib/*),
-   and — when appropriate — collects lead details or generates a real,
-   computed quote, pushing both straight into the Admin Dashboard.
-
-   NOTE ON HONESTY: this widget now calls a real backend (/api/chat) that
-   holds the Anthropic API key server-side and streams Claude's reply back.
-   If that backend is unreachable (not deployed yet, ANTHROPIC_API_KEY
-   missing, offline visitor, etc.) it falls back to the original local
-   FAQ keyword-matching engine below (match()) rather than breaking the
-   chat outright — a visitor should never see a dead widget.
+   VELIX — AI chat assistant widget (v3)
+   - Talks to /api/chat (Claude) through VELIX_CONFIG.apiBase, streaming.
+   - Sends live site facts (published project count + titles) so the AI only
+     ever quotes the real number.
+   - Renders light markdown (bold, bullets, links), auto text direction.
+   - Booking: the AI books the free consultation; the visitor confirms it on
+     WhatsApp with one tap (works on any host, nothing gets lost).
+   - If the AI is unreachable, a bilingual keyword assistant answers instead,
+     tuned for Jordanian/Gulf dialect, and always offers WhatsApp/booking.
    ========================================================================== */
-
 (function () {
-  const CONTACT = {
-    phone: '+962 79 969 1748',
-    phoneHref: '+962799691748',
-    email: 'hello@velixweb.xyz',
-    facebook: 'https://www.facebook.com/profile.php?id=61591738294523',
-    instagram: 'https://www.instagram.com/velixweb26/'
-  };
+  'use strict';
+  var CFG = window.VELIX_CONFIG || {};
+  var API = (CFG.apiBase || '').replace(/\/$/, '') + '/api/chat';
+  var WA = '962799691748';
+  var CONTACT = { phone: '+962 79 969 1748', email: 'hello@velixweb.xyz', wa: 'https://wa.me/' + WA, ig: 'https://www.instagram.com/velix.web/' };
 
-  function getLang() {
-    return (window.VELIX_I18N && window.VELIX_I18N.getLang) ? window.VELIX_I18N.getLang() : 'en';
-  }
+  function lang() { return (window.VELIX_I18N && window.VELIX_I18N.getLang) ? window.VELIX_I18N.getLang() : (document.documentElement.lang === 'ar' ? 'ar' : 'en'); }
 
-  // Each FAQ entry is matched against a shared, bilingual keyword list, then
-  // answered back in whichever language the interface is currently set to.
-  const FAQ = [
-    {
-      keys: ['price', 'cost', 'how much', 'pricing', 'budget', 'quote', 'سعر', 'اسعار', 'تكلفة', 'فلوس'],
-      en: "Our website projects generally start from <strong>70 JOD</strong> and can go up to around <strong>100 JOD</strong> for more customized work. E-commerce stores start from <strong>110 JOD</strong>. The final price depends on the project scope, number of pages, features, integrations, content and complexity. If your budget is tight, tell me your budget and what you need — VELIX can consider the project case by case, but a final adjustment has to be confirmed by the company. I can also help you work out what fits your needs.",
-      ar: "أسعار المواقع عند فيليكس تبدأ عادةً من <strong>70 دينار</strong> وتوصل لحوالي <strong>100 دينار</strong> للمشاريع الأكثر تخصيصًا. المتاجر الإلكترونية تبدأ من <strong>110 دينار</strong>. السعر النهائي يعتمد على حجم المشروع، عدد الصفحات، الخصائص، الربط مع الخدمات الأخرى، المحتوى وتعقيد المشروع. إذا ميزانيتك محدودة، احكيلي ميزانيتك وشو بدك بالضبط — فيليكس بتقدر تراعي المشروع حسب حالته، لكن أي تعديل نهائي على السعر لازم يتأكد من الشركة. وبقدر أساعدك تحدد شو الأنسب لاحتياجك."
-    },
-    {
-      keys: ['how long', 'timeline', 'duration', 'delivery time', 'how many days', 'how many weeks', 'مدة', 'وقت التسليم', 'كم يوم', 'كم اسبوع'],
-      en: "Most landing pages take <strong>1–2 weeks</strong>, business websites <strong>2–4 weeks</strong>, and larger platforms with dashboards or e-commerce <strong>4–8 weeks</strong> — depending on content readiness and revisions. I can give you a firm timeline once I know a bit more about your project.",
-      ar: "معظم صفحات الهبوط تستغرق <strong>1-2 أسبوع</strong>، مواقع الشركات <strong>2-4 أسابيع</strong>، والمنصات الأكبر مع لوحات التحكم أو المتاجر الإلكترونية <strong>4-8 أسابيع</strong> — حسب جاهزية المحتوى والتعديلات. يمكنني إعطاؤك جدولًا زمنيًا دقيقًا بعد معرفة المزيد عن مشروعك."
-    },
-    {
-      keys: ['service', 'what do you do', 'what do you offer', 'offer', 'خدمات', 'شو بتقدموا', 'شغلكم'],
-      en: "VELIX builds premium, high-performance websites end-to-end: web design, front-end &amp; back-end development, e-commerce, landing pages, corporate websites, SEO, security hardening and ongoing maintenance. Basically — everything your business needs to go online and actually convert visitors into customers.",
-      ar: "تبني فيليكس مواقع متميزة وعالية الأداء من الألف إلى الياء: تصميم المواقع، تطوير الواجهات الأمامية والخلفية، المتاجر الإلكترونية، صفحات الهبوط، مواقع الشركات، تحسين محركات البحث، تعزيز الأمان والصيانة المستمرة. باختصار — كل ما يحتاجه عملك للانتقال إلى الإنترنت وتحويل الزوار فعليًا إلى عملاء."
-    },
-    {
-      keys: ['technology', 'tech stack', 'stack', 'framework', 'built with', 'تقنيات'],
-      en: "We choose the right stack for the job rather than forcing one tool everywhere — typically modern HTML5/CSS3/JavaScript on the front end, and React, Node.js or Shopify/WordPress on the back end depending on your needs, with a strong focus on speed and security.",
-      ar: "نختار التقنية المناسبة لكل مشروع بدلًا من فرض أداة واحدة على الجميع — عادةً HTML5/CSS3/JavaScript حديثة في الواجهة الأمامية، وReact أو Node.js أو Shopify/WordPress في الخلفية حسب احتياجاتك، مع تركيز قوي على السرعة والأمان."
-    },
-    {
-      keys: ['support', 'maintenance', 'after launch', 'update my site', 'صيانة', 'دعم'],
-      en: "Every project comes with a post-launch support window, and we offer ongoing maintenance plans after that — covering updates, backups, security monitoring and small content changes, so your site stays fast and safe long after launch.",
-      ar: "كل مشروع يأتي مع فترة دعم بعد الإطلاق، ونقدم خطط صيانة مستمرة بعد ذلك — تشمل التحديثات والنسخ الاحتياطية ومراقبة الأمان والتعديلات الصغيرة على المحتوى، ليبقى موقعك سريعًا وآمنًا لفترة طويلة بعد الإطلاق."
-    },
-    {
-      keys: ['hosting', 'domain', 'server', 'استضافة', 'دومين'],
-      en: "Yes — we can handle hosting and domain setup for you end-to-end, or work with hosting you already have. We'll always recommend the option that's fastest and most reliable for your specific site.",
-      ar: "نعم — يمكننا إدارة الاستضافة وإعداد الدومين لك بالكامل، أو العمل مع الاستضافة الحالية لديك. سنوصي دائمًا بالخيار الأسرع والأكثر موثوقية لموقعك تحديدًا."
-    },
-    {
-      keys: ['seo', 'google ranking', 'search engine', 'ظهور بجوجل', 'محركات البحث'],
-      en: "Every VELIX website ships with SEO fundamentals built in: clean structured markup, fast load times, meta tags, sitemaps and mobile optimization. We also offer deeper ongoing SEO campaigns if you want to actively grow search traffic over time.",
-      ar: "كل موقع من فيليكس يأتي مزودًا بأساسيات تحسين محركات البحث: أكواد نظيفة ومنظمة، أوقات تحميل سريعة، وسوم ميتا، خرائط مواقع وتحسين للجوال. نقدم أيضًا حملات SEO أعمق ومستمرة إذا أردت زيادة زوار البحث بمرور الوقت."
-    },
-    {
-      keys: ['security', 'secure', 'hack', 'protection', 'حماية', 'امان'],
-      en: "Security is standard on every build — HTTPS, hardened forms, regular dependency updates and monitoring. For e-commerce or platforms handling sensitive data we add extra layers like rate-limiting, authentication best practices and regular audits.",
-      ar: "الأمان معيار أساسي في كل بناء — HTTPS، نماذج محصّنة، تحديثات ومراقبة دورية. أما للمتاجر الإلكترونية أو المنصات التي تتعامل مع بيانات حساسة، نضيف طبقات إضافية مثل تحديد معدل الطلبات، أفضل ممارسات المصادقة والمراجعات الدورية."
-    },
-    {
-      keys: ['contact', 'phone', 'number', 'call', 'رقم', 'تواصل', 'اتصال'],
-      en: `You can reach the team directly at <strong>${CONTACT.phone}</strong> or by email at <strong>${CONTACT.email}</strong>. Or — even easier — tell me a bit about your project right here and I'll make sure the right person follows up with you.`,
-      ar: `يمكنك التواصل مع الفريق مباشرة على <strong>${CONTACT.phone}</strong> أو عبر البريد الإلكتروني <strong>${CONTACT.email}</strong>. أو — بشكل أسهل — أخبرني قليلًا عن مشروعك هنا وسأتأكد من أن الشخص المناسب سيتابع معك.`
-    },
-    {
-      keys: ['email', 'mail', 'ايميل', 'بريد'],
-      en: `Our email is <strong>${CONTACT.email}</strong>. I'm also happy to pass your details straight to the team if you'd rather I set that up for you right now.`,
-      ar: `بريدنا الإلكتروني هو <strong>${CONTACT.email}</strong>. يسعدني أيضًا تمرير بياناتك مباشرة إلى الفريق إذا أردت أن أرتب ذلك لك الآن.`
-    },
-    {
-      keys: ['process', 'how does it work', 'steps', 'كيف بتشتغلوا', 'خطوات'],
-      en: "Our process is simple: <strong>1)</strong> Understanding your requirements &amp; goals, <strong>2)</strong> Agreeing on project scope and price, <strong>3)</strong> A <strong>free live design session</strong> where we build your design in front of you and adjust it on the spot until you love it, <strong>4)</strong> Development, <strong>5)</strong> Review meetings (up to 3, max 2 hours each) to fine-tune agreed changes, <strong>6)</strong> Final delivery with your <strong>completion certificate</strong>, <strong>7)</strong> Ongoing support. You'll see progress at every stage before anything goes live.",
-      ar: "عمليتنا بسيطة: <strong>1)</strong> فهم متطلبات وأهداف مشروعك، <strong>2)</strong> الاتفاق على نطاق المشروع والسعر، <strong>3)</strong> <strong>جلسة تصميم مجانية مباشرة</strong> نبني فيها التصميم أمامك ونعدّله فورًا حتى يعجبك، <strong>4)</strong> التنفيذ والتطوير، <strong>5)</strong> اجتماعات مراجعة (حتى 3 اجتماعات، بحد أقصى ساعتين لكل اجتماع) لتنفيذ التعديلات المتفق عليها، <strong>6)</strong> التسليم النهائي مع <strong>شهادة إتمام المشروع</strong>، <strong>7)</strong> الدعم المستمر بعد ذلك. سترى التقدم في كل مرحلة قبل أن يُطلق أي شيء."
-    },
-    {
-      keys: ['meeting', 'meetings', 'how many meetings', 'ميتنج', 'ميتنجات', 'اجتماع', 'اجتماعات'],
-      en: "Every design &amp; development project (websites, stores, landing pages, etc.) includes: one <strong>free design meeting</strong> with no time limit on rounds — we build the design live and revise it together until you're happy — plus up to <strong>3 working meetings</strong> during the rest of the project, each capped at <strong>2 hours</strong>, to review progress and confirm changes. Once you approve the final result, you get a full <strong>completion certificate</strong>. Note: this meeting structure is for design/development — the security &amp; protection plan below works differently, with a separate free consultation and monthly check-ins.",
-      ar: "كل مشروع تصميم وتطوير (مواقع، متاجر، صفحات هبوط... إلخ) يشمل: <strong>اجتماع تصميم مجاني</strong> بدون حد لعدد جولات التعديل — نبني التصميم أمامك ونعدّله سويًا لحد ما يعجبك — بالإضافة إلى <strong>3 اجتماعات عمل</strong> خلال باقي المشروع، بحد أقصى <strong>ساعتين</strong> لكل اجتماع، لمراجعة التقدم وتأكيد التعديلات. بعد موافقتك على النتيجة النهائية بتاخذ <strong>شهادة إتمام مشروع</strong> كاملة. ملاحظة: هذا الهيكل خاص بخدمات التصميم والتطوير — أما خطة الحماية أدناه فتعمل بشكل مختلف، باستشارة مجانية منفصلة ومتابعة شهرية."
-    },
-    {
-      keys: ['protection plan', 'year of support', 'monthly report', 'security plan', 'ongoing protection', 'خطة الحماية', 'حماية سنوية', 'استشارة', 'تقرير شهري', 'متابعة سنوية'],
-      en: "Beyond the build itself, we offer a full year of <strong>website protection &amp; consultation</strong>: it starts with a <strong>free consultation meeting</strong> to review your site's security, then every month for a full year our team runs a check-up and sends you a <strong>complete monthly report</strong> — covering vulnerabilities, backups, uptime and performance. This is separate from the design meetings above and can be added on top of any website or store package.",
-      ar: "بالإضافة إلى بناء الموقع، نقدم <strong>حماية واستشارة لمدة سنة كاملة</strong>: تبدأ باجتماع <strong>استشارة مجاني</strong> لمراجعة أمان موقعك، وبعدها كل شهر لمدة سنة كاملة يقوم فريقنا بفحص شامل ويرسل لك <strong>تقريرًا كاملًا كل شهر</strong> — يغطي الثغرات، النسخ الاحتياطية، جاهزية الموقع والأداء. هذه الخدمة منفصلة عن اجتماعات التصميم أعلاه ويمكن إضافتها فوق أي باقة موقع أو متجر."
-    },
-    {
-      keys: ['certificate', 'guarantee', 'warranty', 'شهادة', 'ضمان'],
-      en: "Yes — every completed project comes with an official <strong>project completion certificate</strong> once you've approved the final result, confirming the scope delivered and the support window that follows. It's part of every package, no extra charge.",
-      ar: "نعم — كل مشروع مكتمل يحصل على <strong>شهادة إتمام مشروع</strong> رسمية بعد موافقتك على النتيجة النهائية، تؤكد نطاق العمل المُسلَّم وفترة الدعم التي تليه. وهي جزء من كل باقة بدون أي تكلفة إضافية."
-    },
-    {
-      keys: ['competitor', 'competitors', 'other agencies', 'other companies', 'why velix', 'why you', 'منافس', 'منافسين', 'شركات ثانية', 'ليش فيليكس', 'ليش نختاركم'],
-      en: "There's no shortage of web agencies in the region, but a few things set VELIX apart: <strong>1)</strong> you watch your design get built live in a free session and request changes on the spot, instead of waiting days between revisions, <strong>2)</strong> a full year of security monitoring with a real monthly report — most agencies stop at delivery, <strong>3)</strong> an official completion certificate for every project, and <strong>4)</strong> direct, personal review of your project by our founder before anything ships. Happy to walk through how that compares to a specific agency you're considering.",
-      ar: "لا يوجد نقص في وكالات الويب في المنطقة، لكن بعض الأشياء تميّز فيليكس: <strong>1)</strong> تشاهد تصميمك يُبنى مباشرة أمامك في جلسة مجانية وتطلب التعديلات فورًا، بدل انتظار أيام بين كل تعديل، <strong>2)</strong> سنة كاملة من مراقبة الأمان مع تقرير شهري حقيقي — معظم الشركات تتوقف عند التسليم، <strong>3)</strong> شهادة إتمام رسمية لكل مشروع، <strong>4)</strong> مراجعة شخصية ومباشرة من مؤسسنا لكل مشروع قبل تسليمه. يسعدني أن أوضح لك كيف تقارن مع شركة معينة تفكر فيها."
-    },
-    {
-      keys: ['follow', 'facebook', 'instagram', 'social media', 'فيسبوك', 'انستا', 'انستقرام', 'تابعوا', 'متابعة'],
-      en: `We'd love to have you with us! Give VELIX a follow on <a href="${CONTACT.facebook}" target="_blank" rel="noopener noreferrer">Facebook</a> and <a href="${CONTACT.instagram}" target="_blank" rel="noopener noreferrer">Instagram</a> — that's where we post new projects, tips, and behind-the-scenes work, and it genuinely helps a small studio like ours grow. Thank you for the support!`,
-      ar: `يسعدنا انضمامك لنا! تابع فيليكس على <a href="${CONTACT.facebook}" target="_blank" rel="noopener noreferrer">فيسبوك</a> و<a href="${CONTACT.instagram}" target="_blank" rel="noopener noreferrer">انستغرام</a> — هناك ننشر مشاريعنا الجديدة ونصائحنا وكواليس عملنا، ومتابعتك تساعد استوديو صغير مثلنا على النمو فعليًا. شكرًا لدعمك!`
-    },
-    {
-      keys: ['portfolio', 'examples', 'work', 'previous projects', 'اعمال سابقة', 'نماذج'],
-      en: 'You can see selected projects on our <a href="portfolio.html">Portfolio page</a> — happy to walk you through which of them is closest to what you have in mind.',
-      ar: 'يمكنك مشاهدة مشاريع مختارة في صفحة <a href="portfolio.html">أعمالنا</a> — يسعدني أن أوضح لك أيها الأقرب لما تفكر فيه.'
-    },
-    {
-      keys: ['who are you', 'company', 'about velix', 'مين انتوا', 'الشركة'],
-      en: 'VELIX Web Solutions is a web design and development company focused on clean, modern websites and online stores. The company is led by <strong>Moatasm Abdeen</strong> (Founder &amp; CEO). For project-specific questions, pricing and availability, visitors can contact <strong>${CONTACT.email}</strong>.',
-      ar: 'فيليكس لحلول الويب شركة متخصصة في تصميم وتطوير المواقع والمتاجر الإلكترونية بشكل عصري ومرتب. يقود الشركة <strong>Moatasm Abdeen</strong> (المؤسس والرئيس التنفيذي). ولأي سؤال عن مشروع محدد أو السعر أو التفاصيل، يمكن التواصل عبر <strong>${CONTACT.email}</strong>.'
-    }
-  ];
-
-  const STR = {
+  /* ---------------- strings ---------------- */
+  var STR = {
     en: {
-      toggleOpen: 'Open live chat',
-      assistantName: 'VELIX Assistant',
-      assistantStatus: 'Typically replies instantly',
-      dialogLabel: 'VELIX live chat',
-      closeLabel: 'Close chat',
-      inputPlaceholder: 'Type your question…',
-      sendLabel: 'Send',
-      greeting: "Welcome to VELIX Web Solutions. I'd be happy to help you choose the best solution for your business — you can ask me about pricing, timelines, our process, or anything else about working with us.",
-      quickReplies: ['Pricing', 'How meetings work', 'Protection plan', 'Talk to a human'],
-      humanHandoff: `Of course — you can call us directly at <strong>${CONTACT.phone}</strong> or email <strong>${CONTACT.email}</strong>. Or share your details below and our team will call you.`,
-      fallback: "Great question — let me make sure our team gives you an exact answer for your specific project. Mind sharing a few details so the right person can follow up?",
-      leadIntro: "I want to make sure the right specialist follows up personally — mind sharing a few details?",
-      leadName: 'Your name',
-      leadPhone: 'Phone number',
-      leadEmail: 'Email (optional)',
-      leadCompany: 'Company (optional)',
-      leadDetails: 'Tell us briefly about your project',
-      leadBudget: 'Estimated budget (optional)',
-      leadTimeline: 'Desired timeline (optional)',
-      leadSubmit: 'Send to VELIX Team',
-      leadThanks: (name) => `Thank you, ${name} — you're all set. A member of the VELIX team will reach out shortly. Anything else I can help with in the meantime? (And if you have a moment, a follow on our <a href="${CONTACT.facebook}" target="_blank" rel="noopener noreferrer">Facebook</a> or <a href="${CONTACT.instagram}" target="_blank" rel="noopener noreferrer">Instagram</a> would mean a lot!)`,
-      quoteTitle: 'Your Quote',
-      quoteRef: 'Reference',
-      quoteTotal: 'Total',
-      quotePriceOnRequest: 'Some items are priced on request — the team will confirm exact figures.',
-      leadSavedNote: 'Saved — the VELIX team can see this in their dashboard.'
+      open: 'Chat with VELIX', name: 'VELIX Assistant', status: 'Online · replies in seconds', close: 'Close chat',
+      placeholder: 'Ask about prices, projects, booking…', send: 'Send',
+      greeting: "Hi! I'm the VELIX assistant. I can tell you about our work, prices and the technologies we use, or book you a free 30-minute consultation.",
+      quick: ['What are your prices?', 'How many projects have you done?', 'Which technologies do you use?', 'Book a free consultation'],
+      bookTitle: 'Consultation requested', bookConfirm: 'Confirm on WhatsApp', bookNote: 'Tap the button to send us the booking. We will confirm right away.',
+      methods: { video: 'Video call', phone: 'Phone call', whatsapp: 'WhatsApp call' },
+      quoteTitle: 'Indicative price', quoteRef: 'Ref', startingFrom: 'Starting from', perMonth: '/ month', quoteNote: 'Starting price. The final price is confirmed in writing after the free consultation.',
+      human: 'Talk to the team directly:', waBtn: 'WhatsApp', callBtn: 'Call', bookBtn: 'Book a consultation',
+      retry: "Sorry, I couldn't finish that reply. Please try again, or message us on WhatsApp.",
+      fallbackUnknown: "Good question. The team can answer that exactly. Message us on WhatsApp or book a free consultation:"
     },
     ar: {
-      toggleOpen: 'فتح المحادثة المباشرة',
-      assistantName: 'مساعد فيليكس',
-      assistantStatus: 'يرد عادة على الفور',
-      dialogLabel: 'محادثة فيليكس المباشرة',
-      closeLabel: 'إغلاق المحادثة',
-      inputPlaceholder: 'اكتب سؤالك…',
-      sendLabel: 'إرسال',
-      greeting: 'مرحبًا بك في فيليكس لحلول الويب. يسعدني مساعدتك في اختيار الحل الأنسب لعملك — يمكنك سؤالي عن الأسعار، الجدول الزمني، طريقة عملنا، أو أي شيء آخر عن العمل معنا.',
-      quickReplies: ['الأسعار', 'آلية الاجتماعات', 'خطة الحماية', 'التحدث مع شخص'],
-      humanHandoff: `بالتأكيد — يمكنك الاتصال بنا مباشرة على <strong>${CONTACT.phone}</strong> أو عبر البريد الإلكتروني <strong>${CONTACT.email}</strong>. أو شارك بياناتك أدناه وسيتصل بك فريقنا.`,
-      fallback: 'سؤال ممتاز — دعني أتأكد من أن فريقنا يعطيك إجابة دقيقة لمشروعك الخاص. هل تمانع مشاركة بعض التفاصيل ليتابع معك الشخص المناسب؟',
-      leadIntro: 'أريد التأكد من أن المختص المناسب سيتابع معك شخصيًا — هل تمانع مشاركة بعض التفاصيل؟',
-      leadName: 'اسمك',
-      leadPhone: 'رقم الهاتف',
-      leadEmail: 'البريد الإلكتروني (اختياري)',
-      leadCompany: 'الشركة (اختياري)',
-      leadDetails: 'أخبرنا باختصار عن مشروعك',
-      leadBudget: 'الميزانية التقديرية (اختياري)',
-      leadTimeline: 'الجدول الزمني المطلوب (اختياري)',
-      leadSubmit: 'إرسال إلى فريق فيليكس',
-      leadThanks: (name) => `شكرًا لك، ${name} — كل شيء جاهز. سيتواصل معك أحد أعضاء فريق فيليكس قريبًا. هل هناك أي شيء آخر يمكنني مساعدتك به في هذه الأثناء؟ (وإذا سمح وقتك، متابعتنا على <a href="${CONTACT.facebook}" target="_blank" rel="noopener noreferrer">فيسبوك</a> أو <a href="${CONTACT.instagram}" target="_blank" rel="noopener noreferrer">انستغرام</a> بتعني الكثير لنا!)`,
-      quoteTitle: 'عرض السعر الخاص بك',
-      quoteRef: 'الرقم المرجعي',
-      quoteTotal: 'الإجمالي',
-      quotePriceOnRequest: 'بعض العناصر سعرها عند الطلب — سيؤكد الفريق الأرقام الدقيقة.',
-      leadSavedNote: 'تم الحفظ — يمكن لفريق فيليكس رؤية هذا في لوحة التحكم.'
+      open: 'احكِ مع VELIX', name: 'مساعد VELIX', status: 'متصل · بيرد خلال ثواني', close: 'إغلاق المحادثة',
+      placeholder: 'اسأل عن الأسعار، المشاريع، الحجز…', send: 'إرسال',
+      greeting: 'أهلاً! أنا مساعد VELIX. بقدر أحكيلك عن شغلنا وأسعارنا والتقنيات اللي بنشتغل فيها، أو أحجزلك استشارة مجانية مدتها 30 دقيقة.',
+      quick: ['كم الأسعار؟', 'كم مشروع اشتغلتوا؟', 'شو التقنيات اللي بتستخدموها؟', 'بدي أحجز استشارة'],
+      bookTitle: 'تم طلب الاستشارة', bookConfirm: 'أكّد على واتساب', bookNote: 'اكبس الزر لتبعتلنا الحجز، وبنأكدلك فوراً.',
+      methods: { video: 'مكالمة فيديو', phone: 'مكالمة هاتفية', whatsapp: 'مكالمة واتساب' },
+      quoteTitle: 'سعر تقديري', quoteRef: 'المرجع', startingFrom: 'يبدأ من', perMonth: '/ شهرياً', quoteNote: 'هذا سعر يبدأ من. السعر النهائي بيتأكد كتابياً بعد الاستشارة المجانية.',
+      human: 'احكِ مع الفريق مباشرة:', waBtn: 'واتساب', callBtn: 'اتصال', bookBtn: 'احجز استشارة',
+      retry: 'آسف، ما قدرت أكمّل الرد. جرّب كمان مرة، أو راسلنا على واتساب.',
+      fallbackUnknown: 'سؤال حلو، والفريق بيجاوبك عليه بالزبط. راسلنا على واتساب أو احجز استشارة مجانية:'
     }
   };
+  function s(k) { var t = STR[lang()] || STR.en; return t[k] !== undefined ? t[k] : STR.en[k]; }
 
-  function s(key) {
-    const table = STR[getLang()] || STR.en;
-    return table[key] !== undefined ? table[key] : STR.en[key];
+  /* ---------------- site facts ---------------- */
+  function siteFacts() {
+    try {
+      var all = (window.VELIX && VELIX.projects && VELIX.projects.all) ? VELIX.projects.all() : [];
+      return { projectCount: all.length, projects: all.slice(0, 30).map(function (p) { return p.title; }) };
+    } catch (e) { return null; }
   }
 
-  function match(text) {
-    const lower = text.toLowerCase();
-    const lang = getLang();
-    for (const item of FAQ) {
-      if (item.keys.some(k => lower.includes(k))) return lang === 'ar' ? item.ar : item.en;
-    }
-    return null;
+  /* ---------------- fallback (no AI) ---------------- */
+  function norm(t) {
+    return (t || '').toLowerCase()
+      .replace(/[ً-ْـ]/g, '')          // harakat + tatweel
+      .replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي');
+  }
+  function projectsAnswer() {
+    var f = siteFacts(); var n = f && f.projectCount;
+    if (lang() === 'ar') return n ? 'منشور على موقعنا حالياً <strong>' + n + '</strong> مشاريع، منها: ' + f.projects.slice(0, 4).join('، ') + '. شوفها كلها بصفحة <a href="portfolio.html">أعمالنا</a>.' : 'بتقدر تشوف مشاريعنا بصفحة <a href="portfolio.html">أعمالنا</a>.';
+    return n ? 'We currently have <strong>' + n + '</strong> projects on our site, including ' + f.projects.slice(0, 4).join(', ') + '. See them all on the <a href="portfolio.html">Portfolio page</a>.' : 'You can see our work on the <a href="portfolio.html">Portfolio page</a>.';
+  }
+  var FAQ = [
+    { k: ['price', 'cost', 'how much', 'pricing', 'budget', 'quote', 'سعر', 'اسعار', 'بكم', 'قديش', 'قداش', 'كم بكلف', 'بكلف', 'تكلف', 'كلفه', 'تكلفه', 'فلوس', 'مصاري', 'دينار', 'باقه', 'باقات'],
+      en: 'Our starting prices (JOD):<ul><li>Landing page from <strong>200</strong></li><li>Business website from <strong>350</strong> (Professional from 650)</li><li>Online store from <strong>400</strong> (Advanced from 800)</li><li>Signature cinematic website from <strong>900</strong></li><li>Web systems and dashboards from <strong>1,500</strong></li></ul>The final price is confirmed in writing after a free consultation.',
+      ar: 'أسعارنا تبدأ من (بالدينار):<ul><li>صفحة هبوط من <strong>200</strong></li><li>موقع شركة من <strong>350</strong> (الاحترافي من 650)</li><li>متجر إلكتروني من <strong>400</strong> (المتقدم من 800)</li><li>موقع سينمائي مخصص من <strong>900</strong></li><li>أنظمة ويب ولوحات تحكم من <strong>1,500</strong></li></ul>والسعر النهائي بيتأكد كتابياً بعد استشارة مجانية.' },
+    { k: ['how many projects', 'projects have you', 'portfolio', 'previous work', 'your work', 'examples', 'كم مشروع', 'مشاريع', 'مشروع اشتغلتو', 'اعمالكم', 'اعمال', 'شغلكم', 'نماذج', 'بورتفوليو'], fn: projectsAnswer },
+    { k: ['technolog', 'tech', 'stack', 'language', 'framework', 'database', 'react', 'next', 'node', 'wordpress', 'تقنيات', 'تقنيه', 'لغات', 'لغه برمجه', 'برمجه', 'داتابيز', 'قاعده بيانات', 'قواعد بيانات', 'بتستخدمو', 'بتشتغلو فيه'],
+      en: 'We pick the stack per project:<ul><li><strong>Front-end:</strong> HTML, CSS, JavaScript, TypeScript, React, Next.js, Tailwind CSS, GSAP</li><li><strong>Back-end:</strong> Node.js, REST APIs</li><li><strong>Databases:</strong> PostgreSQL, SQLite</li><li><strong>CMS:</strong> WordPress or a custom dashboard</li><li><strong>Hosting:</strong> Vercel, GitHub</li></ul>',
+      ar: 'بنختار التقنية حسب المشروع:<ul><li><strong>الواجهة:</strong> HTML وCSS وJavaScript وTypeScript وReact وNext.js وTailwind CSS وGSAP</li><li><strong>الخلفية:</strong> Node.js وREST APIs</li><li><strong>قواعد البيانات:</strong> PostgreSQL وSQLite</li><li><strong>إدارة المحتوى:</strong> WordPress أو لوحة تحكم خاصة</li><li><strong>الاستضافة:</strong> Vercel وGitHub</li></ul>' },
+    { k: ['book', 'appointment', 'meeting', 'consult', 'call me', 'schedule', 'احجز', 'حجز', 'موعد', 'استشاره', 'اجتماع', 'ميتنج', 'كول', 'اتصلو'],
+      en: 'The consultation is <strong>free, 30 minutes</strong>, Saturday to Thursday, 10:00–17:00 Amman time, by video, phone or WhatsApp. Pick a time on the <a href="book.html">booking page</a>.',
+      ar: 'الاستشارة <strong>مجانية ومدتها 30 دقيقة</strong>، من السبت للخميس، من 10 الصبح لـ 5 المسا بتوقيت عمّان، فيديو أو تلفون أو واتساب. اختار موعدك من <a href="book.html">صفحة الحجز</a>.' },
+    { k: ['how long', 'timeline', 'duration', 'delivery', 'weeks', 'days', 'مده', 'وقت', 'قديش بياخد', 'كم يوم', 'كم اسبوع', 'متى بتسلمو', 'تسليم'],
+      en: 'Typically: landing pages <strong>1–2 weeks</strong>, business websites <strong>2–4 weeks</strong>, stores and platforms <strong>4–8 weeks</strong>. We confirm a firm date after a short scoping chat.',
+      ar: 'عادةً: صفحة الهبوط <strong>1–2 أسبوع</strong>، موقع الشركة <strong>2–4 أسابيع</strong>، المتاجر والأنظمة <strong>4–8 أسابيع</strong>. والموعد النهائي بنحدده بعد ما نفهم مشروعك.' },
+    { k: ['service', 'what do you do', 'offer', 'store', 'shop', 'ecommerce', 'website', 'خدمات', 'شو بتعملو', 'شو بتقدمو', 'متجر', 'موقع', 'بدي موقع', 'بدي متجر', 'تطبيق'],
+      en: 'We design, build and secure: business websites, online stores, landing pages, cinematic brand websites, and web systems with dashboards. Tell me what you have in mind and I will suggest the right fit.',
+      ar: 'بنصمّم وبنبني وبنحمي: مواقع شركات، متاجر إلكترونية، صفحات هبوط، مواقع سينمائية للبراندات، وأنظمة ويب بلوحات تحكم. احكيلي شو ببالك وبقترحلك الأنسب.' },
+    { k: ['security', 'secure', 'hack', 'protect', 'ssl', 'https', 'حمايه', 'امان', 'اختراق', 'هكر'],
+      en: 'Security is built in: HTTPS, hardened forms, rate limiting, secure admin sign-in, updates and backups. There is also a monthly protection plan with a written report (35 JOD/month).',
+      ar: 'الحماية جزء من البناء: HTTPS، ونماذج محمية، وحد للطلبات، ودخول آمن للوحة التحكم، وتحديثات ونسخ احتياطية. وفي كمان خطة حماية شهرية مع تقرير مكتوب (35 دينار بالشهر).' },
+    { k: ['hosting', 'domain', 'maintenance', 'support', 'استضافه', 'دومين', 'صيانه', 'دعم'],
+      en: 'We can handle hosting and domain for you. Our care plan (15 JOD/month or 150/year) covers hosting, updates, backups and small edits.',
+      ar: 'بنقدر نتكفّل بالاستضافة والدومين. وخطة الرعاية (15 دينار بالشهر أو 150 بالسنة) بتشمل الاستضافة والتحديثات والنسخ الاحتياطي والتعديلات الصغيرة.' },
+    { k: ['contact', 'phone', 'whatsapp', 'email', 'number', 'تواصل', 'رقم', 'واتس', 'ايميل', 'تلفون', 'هاتف'],
+      en: 'WhatsApp or call <strong>' + CONTACT.phone + '</strong>, or email <strong>' + CONTACT.email + '</strong>.',
+      ar: 'واتساب أو اتصال على <strong dir="ltr">' + CONTACT.phone + '</strong>، أو إيميل <strong>' + CONTACT.email + '</strong>.' },
+    { k: ['hello', 'hi', 'hey', 'salam', 'مرحبا', 'هلا', 'السلام', 'اهلين', 'صباح', 'مسا'],
+      en: 'Hello! How can I help? You can ask about prices, our projects, technologies, or booking a consultation.',
+      ar: 'أهلاً وسهلاً! كيف بقدر أساعدك؟ اسألني عن الأسعار، أو مشاريعنا، أو التقنيات، أو احجز استشارة.' }
+  ];
+  function fallbackAnswer(text) {
+    var t = norm(text), best = null, score = 0;
+    FAQ.forEach(function (f) {
+      var sc = 0; f.k.forEach(function (k) { if (t.indexOf(norm(k)) !== -1) sc += k.length > 4 ? 2 : 1; });
+      if (sc > score) { score = sc; best = f; }
+    });
+    if (!best) return null;
+    return best.fn ? best.fn() : (lang() === 'ar' ? best.ar : best.en);
   }
 
-  function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+  /* ---------------- rendering ---------------- */
+  function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+  function md(text) {
+    var lines = esc(text).split('\n'), out = [], list = false;
+    lines.forEach(function (l) {
+      var m = /^\s*(?:[-•*]|\d+[.)])\s+(.*)$/.exec(l);
+      if (m) { if (!list) { out.push('<ul>'); list = true; } out.push('<li>' + m[1] + '</li>'); return; }
+      if (list) { out.push('</ul>'); list = false; }
+      out.push(l ? l + '<br>' : '<br>');
+    });
+    if (list) out.push('</ul>');
+    return out.join('')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/(https?:\/\/[^\s<]+[^\s<.,،)])/g, '<a href="$1" target="_blank" rel="noopener">$1</a>')
+      .replace(/(<br>)+$/, '');
+  }
+  function actionsHTML() {
+    return '<div class="vc-actions"><a class="vc-act vc-act--wa" href="' + CONTACT.wa + '" target="_blank" rel="noopener">' + s('waBtn') + '</a>' +
+      '<a class="vc-act" href="book.html">' + s('bookBtn') + '</a><a class="vc-act" href="tel:+' + WA + '">' + s('callBtn') + '</a></div>';
+  }
+  function bookingCard(r) {
+    var b = r.booking, ar = lang() === 'ar';
+    var days = { Sunday: 'الأحد', Monday: 'الاثنين', Tuesday: 'الثلاثاء', Wednesday: 'الأربعاء', Thursday: 'الخميس', Saturday: 'السبت' };
+    var day = ar ? (days[b.weekday] || b.weekday) : b.weekday;
+    return '<div class="vc-card"><div class="vc-card__t">' + s('bookTitle') + '</div>' +
+      '<div class="vc-row"><span>' + esc(day) + ' · ' + esc(b.date) + '</span><b dir="ltr">' + String(b.hour).padStart(2, '0') + ':00</b></div>' +
+      '<div class="vc-row"><span>' + esc(s('methods')[b.method] || b.method) + '</span><b>' + esc(b.name) + '</b></div>' +
+      '<a class="vc-cta" href="' + esc(r.whatsappUrl) + '" target="_blank" rel="noopener">' + s('bookConfirm') + '</a>' +
+      '<p class="vc-note">' + s('bookNote') + '</p></div>';
+  }
+  function quoteCard(q) {
+    var ar = lang() === 'ar';
+    var nm = function (x) { return esc(ar && x.name_ar ? x.name_ar : x.name); };
+    var rows = '<div class="vc-row"><span>' + nm(q.package) + '</span><b>' + s('startingFrom') + ' ' + q.package.price + ' ' + q.currency + '</b></div>';
+    (q.addons || []).forEach(function (a) {
+      rows += '<div class="vc-row"><span>' + nm(a) + '</span><b>' + (a.price === null ? '—' : a.price + ' ' + q.currency + (a.unit === 'per_month' ? ' ' + s('perMonth') : '')) + '</b></div>';
+    });
+    return '<div class="vc-card"><div class="vc-card__t">' + s('quoteTitle') + ' <small>' + s('quoteRef') + ' ' + esc(q.referenceNumber) + '</small></div>' + rows + '<p class="vc-note">' + s('quoteNote') + '</p></div>';
   }
 
-  function buildWidget() {
-    const wrap = document.createElement('div');
-    wrap.className = 'velix-chat';
-    wrap.innerHTML = `
-      <button class="velix-chat-toggle" aria-label="${s('toggleOpen')}">
-        <svg class="ic-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-        <svg class="ic-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
-        <span class="velix-chat-dot"></span>
-      </button>
-      <div class="velix-chat-panel" role="dialog" aria-modal="true" aria-label="${s('dialogLabel')}">
-        <div class="velix-chat-head">
-          <div class="velix-chat-avatar">V</div>
-          <div class="velix-chat-head-info">
-            <strong class="velix-chat-name">${s('assistantName')}</strong>
-            <span class="velix-chat-status">${s('assistantStatus')}</span>
-          </div>
-          <button type="button" class="velix-chat-close-mobile" aria-label="${s('closeLabel')}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
-          </button>
-        </div>
-        <div class="velix-chat-body" id="velixChatBody"></div>
-        <div class="velix-chat-quick" id="velixQuickReplies"></div>
-        <form class="velix-chat-input" id="velixChatForm">
-          <input type="text" id="velixChatInput" placeholder="${s('inputPlaceholder')}" autocomplete="off" aria-label="${s('inputPlaceholder')}">
-          <button type="submit" aria-label="${s('sendLabel')}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-          </button>
-        </form>
-      </div>`;
-    document.body.appendChild(wrap);
-    return wrap;
-  }
-
-  function scrollToBottom(body) {
-    body.scrollTop = body.scrollHeight;
-  }
-
-  function addBubble(body, text, who) {
-    const bubble = document.createElement('div');
-    bubble.className = 'velix-bubble ' + (who === 'user' ? 'is-user' : 'is-bot');
-    bubble.innerHTML = text;
-    body.appendChild(bubble);
-    scrollToBottom(body);
-    return bubble;
-  }
-
-  function addTyping(body) {
-    const row = document.createElement('div');
-    row.className = 'velix-typing-row';
-    row.innerHTML = '<span class="velix-typing-avatar">V</span><span class="velix-bubble is-bot is-typing"><span></span><span></span><span></span></span>';
-    body.appendChild(row);
-    scrollToBottom(body);
-    return row;
-  }
-
-  // Quote generator (§19): renders the pricing engine's structured output
-  // as a formatted card in the chat — a real artifact, not just a prose
-  // sentence, per architecture §19's "returns a structured price
-  // breakdown, not prose" requirement.
-  function quoteCard(quote) {
-    const rows = [
-      `<div class="velix-quote-row"><span>${escapeHtml(quote.package.name)}</span><span>${quote.package.price} ${quote.currency}</span></div>`
-    ].concat((quote.addons || []).map(a =>
-      `<div class="velix-quote-row"><span>${escapeHtml(a.name)}</span><span>${a.price === null ? '—' : a.price + ' ' + quote.currency}</span></div>`
-    ));
-    return `<div class="velix-quote-card">
-      <strong>${s('quoteTitle')}</strong>
-      <div class="velix-quote-ref">${s('quoteRef')}: ${escapeHtml(quote.referenceNumber)}</div>
-      ${rows.join('')}
-      <div class="velix-quote-row velix-quote-total"><span>${s('quoteTotal')}</span><span>${quote.total} ${quote.currency}</span></div>
-      ${quote.hasPriceOnRequestItems ? `<div class="velix-quote-note">${s('quotePriceOnRequest')}</div>` : ''}
-    </div>`;
-  }
-
-  function leadForm() {
-    return `<div class="velix-lead-card">
-      <p>${s('leadIntro')}</p>
-      <form id="velixLeadForm" class="velix-lead-form">
-        <input required name="name" placeholder="${s('leadName')}">
-        <input required name="phone" placeholder="${s('leadPhone')}" type="tel">
-        <input name="email" placeholder="${s('leadEmail')}" type="email">
-        <input name="company" placeholder="${s('leadCompany')}">
-        <textarea name="projectDetails" placeholder="${s('leadDetails')}" rows="2"></textarea>
-        <input name="budget" placeholder="${s('leadBudget')}">
-        <input name="timeline" placeholder="${s('leadTimeline')}">
-        <button type="submit" class="btn btn-accent">${s('leadSubmit')}</button>
-      </form>
-    </div>`;
+  /* ---------------- widget ---------------- */
+  function injectCSS() {
+    if (document.getElementById('vc-css')) return;
+    var l = document.createElement('link'); l.id = 'vc-css'; l.rel = 'stylesheet';
+    var me = document.querySelector('script[src*="chat-widget"]');
+    l.href = me ? me.getAttribute('src').replace(/js\/chat-widget\.js.*$/, 'css/chat.css') : 'assets/css/chat.css';
+    document.head.appendChild(l);
   }
 
   function init() {
-    if (!window.VELIX) return; // store.js must load first
-    const widget = buildWidget();
-    const toggle = widget.querySelector('.velix-chat-toggle');
-    const panel = widget.querySelector('.velix-chat-panel');
-    const body = widget.querySelector('#velixChatBody');
-    const form = widget.querySelector('#velixChatForm');
-    const input = widget.querySelector('#velixChatInput');
-    const quickWrap = widget.querySelector('#velixQuickReplies');
+    if (!window.VELIX) return;
+    injectCSS();
+    var root = document.createElement('div');
+    root.className = 'vc';
+    root.innerHTML =
+      '<button class="vc-toggle" type="button" aria-expanded="false"><span class="vc-toggle__ring"></span>' +
+        '<svg class="vc-i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>' +
+        '<svg class="vc-i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>' +
+      '<section class="vc-panel" role="dialog" aria-modal="false">' +
+        '<header class="vc-head"><div class="vc-avatar">V</div><div class="vc-who"><strong class="vc-name"></strong><span class="vc-status"></span></div>' +
+          '<button class="vc-close" type="button"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>' +
+        '<div class="vc-body" aria-live="polite"></div>' +
+        '<div class="vc-quick"></div>' +
+        '<form class="vc-form"><input class="vc-input" type="text" autocomplete="off" maxlength="1500"><button class="vc-send" type="submit"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>' +
+      '</section>';
+    document.body.appendChild(root);
 
-    const closeMobileBtn = widget.querySelector('.velix-chat-close-mobile');
-    const conversationId = VELIX.uid('conv');
-    const transcript = [];
+    var toggle = root.querySelector('.vc-toggle'), panel = root.querySelector('.vc-panel'), body = root.querySelector('.vc-body');
+    var quick = root.querySelector('.vc-quick'), form = root.querySelector('.vc-form'), input = root.querySelector('.vc-input');
+    var history = [], state = 'discovery', aiDown = false, busy = false;
+    var convId = VELIX.uid ? VELIX.uid('conv') : 'conv_' + Date.now(), transcript = [];
 
-    // Short-term memory (§7 MVP: held client-side and sent with every
-    // request rather than server-persisted, since there's no returning-
-    // visitor volume yet to justify server-side long-term memory) and the
-    // conversation manager's current state (§5) — starts at Discovery.
-    let aiHistory = [];
-    let conversationState = 'discovery';
-    let aiUnavailable = false; // flips true after a failed call, so we stop retrying a dead backend all conversation long
-
-    function closePanel() {
-      panel.classList.remove('is-open');
-      toggle.classList.remove('is-open');
+    function labels() {
+      toggle.setAttribute('aria-label', s('open'));
+      panel.setAttribute('aria-label', s('name'));
+      root.querySelector('.vc-name').textContent = s('name');
+      root.querySelector('.vc-status').textContent = s('status');
+      root.querySelector('.vc-close').setAttribute('aria-label', s('close'));
+      input.placeholder = s('placeholder'); input.setAttribute('aria-label', s('placeholder'));
+      root.querySelector('.vc-send').setAttribute('aria-label', s('send'));
+      root.setAttribute('dir', lang() === 'ar' ? 'rtl' : 'ltr');
     }
+    labels();
 
+    function scroll() { body.scrollTop = body.scrollHeight; }
+    function bubble(html, who) {
+      var b = document.createElement('div'); b.className = 'vc-b vc-b--' + who; b.setAttribute('dir', 'auto'); b.innerHTML = html;
+      body.appendChild(b); scroll(); return b;
+    }
+    function typing() { var t = document.createElement('div'); t.className = 'vc-b vc-b--bot vc-typing'; t.innerHTML = '<i></i><i></i><i></i>'; body.appendChild(t); scroll(); return t; }
     function record(text, who) {
-      transcript.push({ text, who, at: new Date().toISOString() });
-      VELIX.conversations.save({ id: conversationId, messages: transcript });
+      transcript.push({ text: text, who: who, at: new Date().toISOString() });
+      try { VELIX.conversations.save({ id: convId, messages: transcript }); } catch (e) {}
+    }
+    function renderQuick() {
+      quick.innerHTML = s('quick').map(function (q) { return '<button type="button" class="vc-chip" dir="auto">' + esc(q) + '</button>'; }).join('');
+      Array.prototype.forEach.call(quick.children, function (b) { b.addEventListener('click', function () { send(b.textContent); }); });
     }
 
-    function renderQuickReplies() {
-      const replies = s('quickReplies');
-      quickWrap.innerHTML = replies.map(q => `<button type="button" class="velix-quick-btn">${q}</button>`).join('');
-      quickWrap.querySelectorAll('.velix-quick-btn').forEach(btn => {
-        btn.addEventListener('click', () => handleUserMessage(btn.textContent));
-      });
+    function fallback(text) {
+      var t = typing();
+      setTimeout(function () {
+        t.remove();
+        var a = fallbackAnswer(text);
+        if (a) { bubble(a, 'bot'); record(a, 'bot'); }
+        else { bubble(s('fallbackUnknown') + actionsHTML(), 'bot'); record('[fallback: actions]', 'bot'); }
+      }, 500 + Math.random() * 300);
     }
 
-    function showLeadForm() {
-      const bubble = addBubble(body, leadForm(), 'bot');
-      bubble.querySelector('#velixLeadForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const data = Object.fromEntries(new FormData(e.target).entries());
-        VELIX.leads.create(Object.assign({}, data, { source: 'Live Chat', conversationId }));
-        record('[Lead submitted: ' + data.name + ']', 'user');
-        bubble.innerHTML = '<p>' + s('leadThanks')(escapeHtml(data.name)) + '</p>';
-      });
-    }
-
-    // Fallback path: the original local keyword-matching engine. Used only
-    // when the AI gateway is unreachable, so a visitor never sees a dead
-    // widget just because the backend isn't deployed yet or is briefly down.
-    function handleWithLocalFallback(text) {
-      const typing = addTyping(body);
-      setTimeout(() => {
-        typing.remove();
-        const lower = text.toLowerCase();
-
-        if (/human|agent|representative|talk to (a )?person|موظف|بشري|شخص حقيقي/.test(lower)) {
-          addBubble(body, s('humanHandoff'), 'bot');
-          showLeadForm();
-          record('[Escalation to human requested]', 'bot');
-          return;
-        }
-
-        const answer = match(text);
-        if (answer) {
-          addBubble(body, answer, 'bot');
-          record(answer, 'bot');
-        } else {
-          addBubble(body, s('fallback'), 'bot');
-          record('[Fallback to lead capture]', 'bot');
-          showLeadForm();
-        }
-      }, 700 + Math.random() * 400);
-    }
-
-    // Primary path: the real AI gateway (/api/chat → Claude, see
-    // /api/chat.js). Streams newline-delimited JSON events and renders
-    // text incrementally into a single bot bubble, executes any function
-    // calls' results (lead saved / quote generated) as they resolve, and
-    // updates the conversation state machine (§5) from the final event.
-    async function handleWithAI(text) {
-      const typing = addTyping(body);
-      let bubble = null;
-      let bubbleText = '';
-
+    async function ai(text) {
+      var t = typing(), b = null, acc = '';
       try {
-        const response = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            sessionId: VELIX.session.getToken(),
-            message: text,
-            history: aiHistory,
-            state: conversationState,
-            lang: getLang()
-          })
-        });
-
-        if (!response.ok || !response.body) throw new Error('AI gateway unavailable');
-
-        typing.remove();
-
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = '';
-        let finalQuote = null;
-
+        var r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: VELIX.session ? VELIX.session.getToken() : convId, message: text, history: history, state: state, lang: lang(), siteFacts: siteFacts() }) });
+        if (!r.ok || !r.body) { var e = new Error('http'); e.down = true; throw e; }
+        var reader = r.body.getReader(), dec = new TextDecoder(), buf = '', errored = false;
+        t.remove();
         while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split('\n');
-          buffer = lines.pop(); // last (possibly incomplete) line stays in the buffer
-
-          for (const line of lines) {
-            if (!line.trim()) continue;
-            let evt;
-            try { evt = JSON.parse(line); } catch (e) { continue; }
-
-            if (evt.type === 'text') {
-              if (!bubble) bubble = addBubble(body, '', 'bot');
-              bubbleText += evt.delta;
-              bubble.innerHTML = escapeHtml(bubbleText).replace(/\n/g, '<br>');
-              scrollToBottom(body);
-            } else if (evt.type === 'tool_result') {
-              if (evt.tool === 'generate_quote' && evt.result && evt.result.success) {
-                finalQuote = evt.result.quote;
-                addBubble(body, quoteCard(evt.result.quote), 'bot');
-              } else if (evt.tool === 'create_lead' && evt.result && evt.result.success) {
-                addBubble(body, `<em>${s('leadSavedNote')}</em>`, 'bot');
-              } else if (evt.tool === 'escalate_to_human' && evt.result && evt.result.success) {
-                addBubble(body, s('humanHandoff'), 'bot');
-              }
-            } else if (evt.type === 'done') {
-              conversationState = evt.state || conversationState;
-            } else if (evt.type === 'error') {
-              throw new Error(evt.error || 'AI error');
+          var chunk = await reader.read(); if (chunk.done) break;
+          buf += dec.decode(chunk.value, { stream: true });
+          var lines = buf.split('\n'); buf = lines.pop();
+          lines.forEach(function (line) {
+            if (!line.trim()) return; var ev; try { ev = JSON.parse(line); } catch (x) { return; }
+            if (ev.type === 'text') { if (!b) b = bubble('', 'bot'); acc += ev.delta; b.innerHTML = md(acc); scroll(); }
+            else if (ev.type === 'tool_result' && ev.result && ev.result.success) {
+              if (ev.tool === 'book_consultation') { bubble(bookingCard(ev.result), 'bot'); b = null; acc += '\n'; }
+              else if (ev.tool === 'generate_quote') { bubble(quoteCard(ev.result.quote), 'bot'); b = null; acc += '\n'; }
+              else if (ev.tool === 'escalate_to_human') { bubble(s('human') + actionsHTML(), 'bot'); b = null; acc += '\n'; }
             }
-          }
+            else if (ev.type === 'done') { state = ev.state || state; }
+            else if (ev.type === 'error') { errored = true; }
+          });
         }
-
-        if (bubbleText) {
-          record(bubbleText, 'bot');
-          aiHistory.push({ role: 'user', content: text });
-          aiHistory.push({ role: 'assistant', content: bubbleText });
-        } else if (finalQuote) {
-          aiHistory.push({ role: 'user', content: text });
-          aiHistory.push({ role: 'assistant', content: `[Quote generated: ${finalQuote.referenceNumber}]` });
-        }
+        if (errored && !acc.trim()) bubble(s('retry') + actionsHTML(), 'bot');
+        if (acc.trim()) { history.push({ role: 'user', content: text }, { role: 'assistant', content: acc.trim() }); history = history.slice(-20); record(acc.trim(), 'bot'); }
       } catch (err) {
-        typing.remove();
-        if (bubble) bubble.remove(); // partial stream — discard rather than show a broken half-answer
-        aiUnavailable = true;
-        handleWithLocalFallback(text);
+        t.remove();
+        if (b) b.remove();
+        if (err && err.down) aiDown = true; // only a missing/broken endpoint switches to the offline assistant
+        else if (!err || err.name !== 'TypeError') { bubble(s('retry') + actionsHTML(), 'bot'); return; }
+        aiDown = true;
+        fallback(text);
       }
     }
 
-    function handleUserMessage(text) {
-      if (!text.trim()) return;
-      addBubble(body, escapeHtml(text), 'user');
-      record(text, 'user');
-      input.value = '';
-
-      if (aiUnavailable) {
-        handleWithLocalFallback(text);
-      } else {
-        handleWithAI(text);
-      }
+    async function send(text) {
+      text = (text || '').trim(); if (!text || busy) return;
+      busy = true; quick.innerHTML = '';
+      bubble(esc(text), 'user'); record(text, 'user'); input.value = '';
+      if (aiDown || !CFG.aiEnabled) fallback(text); else await ai(text);
+      busy = false;
     }
 
-    toggle.addEventListener('click', () => {
-      const isOpen = panel.classList.toggle('is-open');
-      toggle.classList.toggle('is-open', isOpen);
-      if (isOpen && !body.dataset.greeted) {
-        body.dataset.greeted = '1';
-        const typing = addTyping(body);
-        setTimeout(() => {
-          typing.remove();
-          const greeting = s('greeting');
-          addBubble(body, greeting, 'bot');
-          record(greeting, 'bot');
-          renderQuickReplies();
-        }, 600);
-      }
-    });
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      handleUserMessage(input.value);
-    });
-
-    if (closeMobileBtn) {
-      closeMobileBtn.addEventListener('click', closePanel);
+    function open(v) {
+      panel.classList.toggle('is-open', v); toggle.classList.toggle('is-open', v); toggle.setAttribute('aria-expanded', v ? 'true' : 'false');
+      if (v && !body.dataset.greeted) { body.dataset.greeted = '1'; var g = s('greeting'); bubble(g, 'bot'); record(g, 'bot'); renderQuick(); }
+      if (v && matchMedia('(min-width: 700px)').matches) setTimeout(function () { input.focus(); }, 250);
     }
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && panel.classList.contains('is-open')) closePanel();
-    });
-
-    // Keep the chrome (labels, placeholders, quick replies not yet answered)
-    // in sync if the visitor switches language mid-conversation. Messages
-    // already sent stay as they were said — only the UI shell and any
-    // not-yet-used quick replies refresh to the new language.
-    document.addEventListener('velix:langchange', () => {
-      toggle.setAttribute('aria-label', s('toggleOpen'));
-      panel.setAttribute('aria-label', s('dialogLabel'));
-      const nameEl = widget.querySelector('.velix-chat-name');
-      const statusEl = widget.querySelector('.velix-chat-status');
-      if (nameEl) nameEl.textContent = s('assistantName');
-      if (statusEl) statusEl.textContent = s('assistantStatus');
-      input.setAttribute('placeholder', s('inputPlaceholder'));
-      input.setAttribute('aria-label', s('inputPlaceholder'));
-      const sendBtn = form.querySelector('button[type="submit"]');
-      if (sendBtn) sendBtn.setAttribute('aria-label', s('sendLabel'));
-      if (closeMobileBtn) closeMobileBtn.setAttribute('aria-label', s('closeLabel'));
-      if (quickWrap.childElementCount) renderQuickReplies();
-    });
+    toggle.addEventListener('click', function () { open(!panel.classList.contains('is-open')); });
+    root.querySelector('.vc-close').addEventListener('click', function () { open(false); });
+    form.addEventListener('submit', function (e) { e.preventDefault(); send(input.value); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && panel.classList.contains('is-open')) open(false); });
+    document.addEventListener('velix:langchange', function () { labels(); if (quick.childElementCount) renderQuick(); });
+    window.VELIX_CHAT = { open: function () { open(true); } };
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "last_updated": "2026-10-29",
+  "consultation": {
+    "price": "free",
+    "length_minutes": 30,
+    "commitment": "none",
+    "methods": [
+      {
+        "id": "video",
+        "en": "Video call (Google Meet)",
+        "ar": "مكالمة فيديو (Google Meet)"
+      },
+      {
+        "id": "phone",
+        "en": "Phone call (we call you)",
+        "ar": "مكالمة هاتفية (نحن نتصل)"
+      },
+      {
+        "id": "whatsapp",
+        "en": "WhatsApp call",
+        "ar": "مكالمة واتساب"
+      }
+    ],
+    "days": "Saturday to Thursday (no Fridays)",
+    "hours": "10:00 to 17:00 Amman time (GMT+3); slots start on the hour from 10:00 to 16:00",
+    "rules": [
+      "A slot must be at least 2 hours from now",
+      "Bookings up to 14 days ahead",
+      "The booking is confirmed when the visitor sends the WhatsApp confirmation message"
+    ]
+  }
+}

@@ -27,10 +27,33 @@ const { TOOL_SCHEMAS, executeTool } = require('../lib/tools');
 const { STATES, nextState, toolsForState } = require('../lib/conversationState');
 const store = require('../lib/store');
 
-const MODEL = 'claude-sonnet-4-5-20250929';
+const MODEL = process.env.VELIX_AI_MODEL || 'claude-sonnet-5-5';
+
+// The public site is static (GitHub Pages) while this endpoint can live on a
+// separate host (e.g. Vercel). Only VELIX's own origins may call it.
+const ALLOWED_ORIGINS = (process.env.VELIX_ALLOWED_ORIGINS || 'https://velixweb.xyz,https://www.velixweb.xyz,http://localhost:3000').split(',').map((o) => o.trim());
+function applyCors(req, res) {
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Max-Age', '86400');
+  }
+}
+
+function cleanSiteFacts(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const count = Number(raw.projectCount);
+  const projects = Array.isArray(raw.projects) ? raw.projects.filter((t) => typeof t === 'string').slice(0, 30).map((t) => t.slice(0, 80)) : [];
+  return { projectCount: Number.isInteger(count) && count >= 0 && count < 1000 ? count : null, projects };
+}
 const MAX_HISTORY_MESSAGES = 20; // crude token-budget discipline (§8) until real summarization is built
 
 module.exports = async (req, res) => {
+  applyCors(req, res);
+  if (req.method === 'OPTIONS') { res.statusCode = 204; res.end(); return; }
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
     return;
@@ -84,7 +107,7 @@ module.exports = async (req, res) => {
 
   const allowedTools = toolsForState(state);
   const toolSchemas = allowedTools.map((name) => TOOL_SCHEMAS[name]).filter(Boolean);
-  const systemPrompt = buildSystemPrompt({ lang, state, functionToolNames: allowedTools });
+  const systemPrompt = buildSystemPrompt({ lang, state, functionToolNames: allowedTools, siteFacts: cleanSiteFacts(body.siteFacts) });
 
   const messages = [
     ...history.filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string'),
@@ -114,7 +137,7 @@ module.exports = async (req, res) => {
       safetyLoops += 1;
       const stream = anthropic.messages.stream({
         model: MODEL,
-        max_tokens: 700,
+        max_tokens: 800,
         system: systemPrompt,
         messages: currentMessages,
         tools: toolSchemas.length ? toolSchemas : undefined
@@ -142,6 +165,9 @@ module.exports = async (req, res) => {
         if (toolUse.name === 'generate_quote' && result.success) {
           lastQuote = result.quote;
           nextConvState = nextState(state, 'wants_quote');
+        }
+        if (toolUse.name === 'book_consultation' && result.success) {
+          nextConvState = STATES.CLOSING;
         }
         if (toolUse.name === 'create_lead' && result.success) {
           nextConvState = STATES.CLOSING;
