@@ -58,6 +58,12 @@
   // Portfolio cards render later from data — pick them up too
   document.addEventListener('velix:projects-rendered', reveal);
 
+  // Menu always opens at the top
+  var mnav = document.getElementById('mobileNav');
+  if (mnav && 'MutationObserver' in window) new MutationObserver(function () {
+    if (mnav.classList.contains('is-open')) { var b = mnav.querySelector('.mobile-nav-body'); if (b) b.scrollTop = 0; }
+  }).observe(mnav, { attributes: true, attributeFilter: ['class'] });
+
   // Any [data-open-chat] button opens the assistant
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-open-chat]');

@@ -61,3 +61,7 @@ html[lang="ar"] .vc{font-family:var(--ar-text,'IBM Plex Sans Arabic',system-ui,s
   .vc-toggle.is-open{opacity:0;pointer-events:none}
 }
 @media (prefers-reduced-motion:reduce){.vc *{animation:none!important;transition:none!important}}
+.vc-cal{display:block;text-align:center;margin-top:8px;padding:10px;border-radius:12px;border:1px solid var(--vc-line);color:var(--vc-ink)!important;font-weight:600;font-size:13.5px;text-decoration:none!important}
+.vc-cal:hover{background:#ffffff0d}
+body.nav-open .vc{display:none}
+.vc-ok{margin-top:10px;padding:11px;border-radius:12px;text-align:center;font-weight:700;background:#2ecc7122;color:#5be39b;border:1px solid #2ecc7144}
