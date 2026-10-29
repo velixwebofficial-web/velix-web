@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<script>(function(){try{var l=localStorage.getItem('velix-lang');if(!l){var n=(navigator.language||'en').toLowerCase();l=n.indexOf('ar')===0?'ar':'en';}document.documentElement.setAttribute('lang',l);document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');}catch(e){}})();</script>
+<script>(function(){try{var l=localStorage.getItem('velix-lang');if(!l){var n=(navigator.language||'en').toLowerCase();l=n.indexOf('ar')===0?'ar':'en';}document.documentElement.setAttribute('lang',l);document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');if(!sessionStorage.getItem('v9-seen')&&!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('v9-pre-on');}catch(e){}})();</script>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>VELIX Web Solutions — Websites that win you clients</title>
 <meta content="VELIX Web Solutions designs and builds premium, high-performance websites for ambitious businesses across Jordan, Saudi Arabia, the UAE, Qatar, Kuwait and beyond." name="description"/>
@@ -42,9 +42,8 @@
 </script>
 <meta content="#050506" name="theme-color"/>
 <link as="font" crossorigin="" href="assets/fonts/archivo-latin-standard-normal.woff2" rel="preload" type="font/woff2"/>
-<link as="image" href="assets/img/hero-stage.webp" rel="preload" type="image/webp" media="(min-width: 760px)"/>
-<link as="image" href="assets/img/hero-stage-m.webp" rel="preload" type="image/webp" media="(max-width: 759px)"/>
 <link href="assets/css/velix.css" rel="stylesheet"/>
+<link href="assets/css/v9.css" rel="stylesheet"/>
 <link href="assets/css/home.css" rel="stylesheet"/>
 </head>
 <body class="home">
@@ -97,178 +96,182 @@
 </div>
 </nav>
 <a class="skip-link" data-i18n="t_skip_link" href="#main-content">Skip to main content</a>
-<main id="main-content">
-<!-- ============ 1. HERO — what we do, in one frame ============ -->
-<section class="h-hero" id="top">
-<div class="h-stage" aria-hidden="true">
-<picture>
-<source media="(max-width: 759px)" srcset="assets/img/hero-stage-m.webp" type="image/webp"/>
-<source media="(max-width: 759px)" srcset="assets/img/hero-stage-m.jpg"/>
-<source srcset="assets/img/hero-stage.webp" type="image/webp"/>
-<img src="assets/img/hero-stage.jpg" alt="" width="1672" height="941" fetchpriority="high"/>
-</picture>
-<div class="h-beam"></div>
-<div class="h-shade"></div>
-<div class="h-grain"></div>
+<main id="main-content" class="v9">
+
+<!-- Preloader -->
+<div class="v9-pre" id="v9Pre" aria-hidden="true">
+  <div class="v9-pre__ring"><img src="assets/img/logo-mark-light.png" alt="" width="46" height="38"/></div>
+  <div class="v9-pre__count"><span id="v9PreNum">0</span><i>%</i></div>
+  <p class="v9-pre__txt" data-i18n="t_v9_pre">Getting the page ready…</p>
+  <div class="v9-pre__bar"><span id="v9PreBar"></span></div>
 </div>
-<div class="h-letterbox h-letterbox-top" aria-hidden="true"></div>
-<div class="h-letterbox h-letterbox-bottom" aria-hidden="true"></div>
-<div class="container h-hero-inner">
-<p class="h-kicker"><span class="h-dot" aria-hidden="true"></span><span data-i18n="t_v7_kicker">VELIX Web Solutions · Amman</span></p>
-<h1 class="h-title">
-<span class="h-line"><span data-i18n="t_v7_h1a">Websites that</span></span>
-<span class="h-line"><span data-i18n="t_v7_h1b">win you clients.</span></span>
-</h1>
-<p class="h-lede" data-i18n="t_v7_lede">We design, build and secure websites for businesses in Jordan and the Gulf, in Arabic and English.</p>
-<div class="h-actions">
-<a class="btn btn-primary btn-lg" href="book.html" data-i18n="t_v7_cta_book_free">Book a free consultation</a>
-<a class="h-link" href="#portfolio"><span data-i18n="t_v7_cta_work">See our work</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg></a>
-</div>
-</div>
-<ul class="container h-facts">
-<li><b data-i18n="t_v7_f1t">Arabic + English</b><span data-i18n="t_v7_f1b">Built right in both directions</span></li>
-<li><b data-i18n="t_v7_f2t">Security built in</b><span data-i18n="t_v7_f2b">Protected from the first line of code</span></li>
-<li><b data-i18n="t_v7_f3t">Clear proposal first</b><span data-i18n="t_v7_f3b">Scope and price in writing before we start</span></li>
-</ul>
+
+<!-- HERO -->
+<section class="v9-hero" id="top">
+  <div class="v9-hero__bg" aria-hidden="true"><span class="v9-glow v9-glow--a"></span><span class="v9-glow v9-glow--b"></span><span class="v9-grid"></span></div>
+  <div class="container v9-hero__inner">
+    <div class="v9-hero__copy">
+      <span class="v9-badge" data-hero><i></i><span data-i18n="t_v9_avail">Available for new projects</span></span>
+      <h1 class="v9-hero__title">
+        <span class="v9-line"><span data-i18n="t_v9_h1a">We build websites</span></span>
+        <span class="v9-line"><span data-i18n="t_v9_h1b">that bring</span></span>
+        <span class="v9-line"><span class="v9-blue" data-i18n="t_v9_h1c">you clients.</span></span>
+      </h1>
+      <p class="v9-hero__sub" data-hero data-i18n="t_v9_hsub">VELIX is a web studio in Amman. We design and build fast, bilingual websites, stores and systems — from the first idea to launch and beyond.</p>
+      <div class="v9-hero__cta" data-hero>
+        <a class="v9-btn v9-btn--blue" href="book.html"><span data-i18n="t_v9_cta_book">Book a free consultation</span><b class="v9-btn__ic"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></b></a>
+        <a class="v9-btn v9-btn--ghost" href="#work"><span data-i18n="t_v9_cta_work">See our work</span></a>
+      </div>
+    </div>
+    <div class="v9-hero__stage" id="v9Stage" aria-hidden="true">
+      <div class="v9-fan" id="v9Fan"></div>
+      <div class="v9-orbit"><span></span></div>
+    </div>
+  </div>
+  <div class="v9-marquee" aria-hidden="true">
+    <div class="v9-marquee__track">
+      <span data-i18n="t_v9_sv1">Websites &amp; landing pages</span><em>✦</em><span data-i18n="t_v9_sv2">Online stores</span><em>✦</em><span data-i18n="t_v9_sv3">Web systems &amp; dashboards</span><em>✦</em><span data-i18n="t_v9_sv4">UI/UX design</span><em>✦</em><span data-i18n="t_v9_sv5">SEO &amp; speed</span><em>✦</em><span data-i18n="t_v9_sv6">Security &amp; care</span><em>✦</em>
+    </div>
+  </div>
 </section>
 
-<!-- ============ 2. SERVICES — can you build what I need? ============ -->
-<section class="h-section" id="services">
-<div class="container">
-<header class="h-head" data-rv>
-<p class="h-eyebrow" data-i18n="t_v7_svc_eyebrow">What we build</p>
-<h2 data-i18n="t_v7_svc_title">Four things, done properly.</h2>
-</header>
-<div class="h-svc-grid">
-<a class="h-svc" href="services.html#corporate-websites" data-rv>
-<span class="h-svc-n">01</span>
-<h3 data-i18n="t_v7_s1t">Business websites</h3>
-<p data-i18n="t_v7_s1b">A site that explains what you do in five seconds and turns visitors into calls.</p>
-<ul class="h-tags"><li data-i18n="t_v7_tag_bi">Arabic &amp; English</li><li data-i18n="t_v7_tag_seo">SEO-ready</li><li data-i18n="t_v7_tag_cms">Easy to update</li></ul>
-</a>
-<a class="h-svc" href="services.html#ecommerce" data-rv>
-<span class="h-svc-n">02</span>
-<h3 data-i18n="t_v7_s2t">Online stores</h3>
-<p data-i18n="t_v7_s2b">Stores built to sell: fast checkout, local payment options and simple product management.</p>
-<ul class="h-tags"><li data-i18n="t_v7_tag_pay">Payments</li><li data-i18n="t_v7_tag_mobile">Mobile-first</li><li data-i18n="t_v7_tag_secure">Secure checkout</li></ul>
-</a>
-<a class="h-svc" href="services.html#landing-pages" data-rv>
-<span class="h-svc-n">03</span>
-<h3 data-i18n="t_v7_s3t">Landing pages</h3>
-<p data-i18n="t_v7_s3b">One page, one goal. Built for ad campaigns, launches and lead generation.</p>
-<ul class="h-tags"><li data-i18n="t_v7_tag_fast">Fast loading</li><li data-i18n="t_v7_tag_conv">Built to convert</li><li data-i18n="t_v7_tag_track">Analytics</li></ul>
-</a>
-<a class="h-svc" href="services.html#web-development" data-rv>
-<span class="h-svc-n">04</span>
-<h3 data-i18n="t_v7_s4t">Custom web systems</h3>
-<p data-i18n="t_v7_s4b">Booking systems, dashboards and internal tools that replace spreadsheets and paperwork.</p>
-<ul class="h-tags"><li data-i18n="t_v7_tag_dash">Dashboards</li><li data-i18n="t_v7_tag_roles">User accounts</li><li data-i18n="t_v7_tag_api">Integrations</li></ul>
-</a>
-</div>
-</div>
+<!-- STATS (real numbers only) -->
+<section class="v9-stats">
+  <div class="container v9-stats__grid">
+    <div class="v9-stat" data-rv><b><span class="v9-count" id="v9ProjCount" data-to="0">0</span></b><span data-i18n="t_v9_st_proj">Published projects</span></div>
+    <div class="v9-stat" data-rv><b dir="ltr">AR · EN</b><span data-i18n="t_v9_st_lang">Two languages on every site</span></div>
+    <div class="v9-stat" data-rv><b><span class="v9-count" data-to="30">0</span></b><span data-i18n="t_v9_st_call">Minute free first call</span></div>
+    <div class="v9-stat" data-rv><b><span class="v9-count" data-to="200">0</span></b><span data-i18n="t_v9_st_price">JD — websites start from</span></div>
+  </div>
 </section>
 
-<!-- ============ 3. WORK — show me ============ -->
-<section class="h-section h-work" id="portfolio">
-<div class="container portfolio-wide">
-<header class="h-head h-head-row" data-rv>
-<div>
-<p class="h-eyebrow" data-i18n="t_v7_work_eyebrow">Selected work</p>
-<h2 data-i18n="t_v7_work_title">Real projects, live online.</h2>
-</div>
-<a class="h-link" href="portfolio.html"><span data-i18n="t_eb1d7577">View All Projects</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
-</header>
-<div class="portfolio-grid" id="homeFeaturedGrid"><p class="portfolio-empty" data-i18n="t_v2_loading">Loading featured projects…</p></div>
-</div>
+<!-- PRINCIPLES carousel -->
+<section class="v9-sec v9-pr" id="principles">
+  <div class="container">
+    <div class="v9-head" data-rv>
+      <span class="v9-eyebrow" data-i18n="t_v9_pr_eyebrow">How we think</span>
+      <h2 data-i18n="t_v9_pr_title">Three words run every project.</h2>
+    </div>
+    <div class="v9-pr__box" data-rv>
+      <div class="v9-pr__tabs" role="tablist">
+        <button class="v9-pr__tab is-on" role="tab" data-i="0"><small>01</small><span data-i18n="t_v9_pr1_w">We understand.</span><i><b></b></i></button>
+        <button class="v9-pr__tab" role="tab" data-i="1"><small>02</small><span data-i18n="t_v9_pr2_w">We build.</span><i><b></b></i></button>
+        <button class="v9-pr__tab" role="tab" data-i="2"><small>03</small><span data-i18n="t_v9_pr3_w">We protect.</span><i><b></b></i></button>
+      </div>
+      <div class="v9-pr__panes">
+        <div class="v9-pr__pane is-on"><div class="v9-pr__icon"><svg viewBox="0 0 48 48"><circle cx="21" cy="21" r="12"/><path d="m30 30 10 10"/></svg></div><p data-i18n="t_v9_pr1_d">Before any design, we learn your business, your customers and what a visitor must do on your site. The website is built around that goal.</p></div>
+        <div class="v9-pr__pane"><div class="v9-pr__icon"><svg viewBox="0 0 48 48"><path d="m17 14-10 10 10 10M31 14l10 10-10 10M27 10l-6 28"/></svg></div><p data-i18n="t_v9_pr2_d">Hand-written code, real performance, Arabic and English done properly — not a template with your logo on it.</p></div>
+        <div class="v9-pr__pane"><div class="v9-pr__icon"><svg viewBox="0 0 48 48"><path d="M24 6 9 12v11c0 9 6.5 16 15 19 8.5-3 15-10 15-19V12z"/><path d="m17 24 5 5 9-10"/></svg></div><p data-i18n="t_v9_pr3_d">After launch we stay: security, backups, updates and a monthly check, so your site keeps working while you focus on your business.</p></div>
+        <button class="v9-pr__pause" id="v9PrPause" type="button" aria-pressed="false"><svg class="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg><svg class="i-play" viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z"/></svg><span class="sr" data-i18n="t_v9_pause">Pause</span></button>
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- ============ 4. SECURITY — will my site be safe? ============ -->
-<section class="h-section h-sec" id="security">
-<div class="container h-sec-grid">
-<div class="h-sec-visual" aria-hidden="true" data-rv>
-<svg class="h-orbit" viewBox="0 0 400 400">
-<defs>
-<radialGradient id="hcore" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#1D4EFF" stop-opacity=".55"/><stop offset="1" stop-color="#1D4EFF" stop-opacity="0"/></radialGradient>
-<linearGradient id="hscan" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3D68FF" stop-opacity="0"/><stop offset="1" stop-color="#3D68FF"/></linearGradient>
-</defs>
-<circle cx="200" cy="200" r="190" fill="url(#hcore)"/>
-<circle class="o1" cx="200" cy="200" r="170" fill="none" stroke="rgba(237,238,240,.14)" stroke-dasharray="2 10"/>
-<circle class="o2" cx="200" cy="200" r="132" fill="none" stroke="rgba(237,238,240,.22)"/>
-<circle class="o3" cx="200" cy="200" r="94" fill="none" stroke="rgba(237,238,240,.12)" stroke-dasharray="40 14"/>
-<g class="h-scan"><path d="M200 200 L370 200 A170 170 0 0 0 320 80 Z" fill="url(#hscan)" opacity=".28"/></g>
-<g transform="translate(200 200)">
-<path d="M0-52 L40-36 V2 C40 30 22 46 0 56 C-22 46-40 30-40 2 V-36 Z" fill="#0B0D12" stroke="#3D68FF" stroke-width="2"/>
-<path class="h-check" d="M-16 2 L-4 14 L18-10" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-</g>
-<circle class="h-ping p1" cx="318" cy="118" r="4" fill="#3D68FF"/>
-<circle class="h-ping p2" cx="92" cy="270" r="4" fill="#3D68FF"/>
-<circle class="h-ping p3" cx="250" cy="335" r="4" fill="#3D68FF"/>
-</svg>
-</div>
-<div>
-<header class="h-head" data-rv>
-<p class="h-eyebrow" data-i18n="t_v7_sec_eyebrow">Why VELIX</p>
-<h2 data-i18n="t_v7_sec_title">Security isn't an add-on. It's how we build.</h2>
-<p class="h-head-p" data-i18n="t_v7_sec_body">Most small business websites are never checked after launch. Security is our background, so every VELIX site ships protected.</p>
-</header>
-<ul class="h-checks">
-<li data-rv><h3 data-i18n="t_v6_s1t">HTTPS everywhere</h3><p data-i18n="t_v6_s1b">Every page is encrypted from the first visit, with the certificate renewed for you.</p></li>
-<li data-rv><h3 data-i18n="t_v6_s2t">Hardened forms</h3><p data-i18n="t_v6_s2b">Contact and quote forms filter spam, bots and injection attempts before they reach you.</p></li>
-<li data-rv><h3 data-i18n="t_v6_s3t">Updates and monitoring</h3><p data-i18n="t_v6_s3b">We watch the libraries your site depends on and patch known vulnerabilities quickly.</p></li>
-<li data-rv><h3 data-i18n="t_v6_s4t">Automated backups</h3><p data-i18n="t_v6_s4b">If something goes wrong, your site can be restored instead of rebuilt.</p></li>
-</ul>
-</div>
-</div>
+<!-- WORK draggable carousel -->
+<section class="v9-sec v9-work" id="work">
+  <div class="container v9-work__head">
+    <div class="v9-head" data-rv>
+      <span class="v9-eyebrow" data-i18n="t_v9_wk_eyebrow">Selected work</span>
+      <h2 data-i18n="t_v9_wk_title">Projects we're proud of.</h2>
+    </div>
+    <div class="v9-work__ctrl" data-rv>
+      <button class="v9-arrow" id="v9Prev" type="button" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <button class="v9-arrow" id="v9Next" type="button" aria-label="Next"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
+      <a class="v9-link" href="portfolio.html"><span data-i18n="t_v9_wk_all">All projects</span><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+    </div>
+  </div>
+  <div class="v9-work__rail" id="v9Rail"><div class="v9-work__track" id="v9Track"></div></div>
+  <div class="v9-drag" id="v9Drag" aria-hidden="true"><span data-i18n="t_v9_wk_drag">Drag</span></div>
 </section>
 
-<!-- ============ 5. PROCESS — how painful is this for me? ============ -->
-<section class="h-section" id="process">
-<div class="container">
-<header class="h-head" data-rv>
-<p class="h-eyebrow" data-i18n="t_v7_proc_eyebrow">How it works</p>
-<h2 data-i18n="t_v7_proc_title">From first call to launch.</h2>
-</header>
-<ol class="h-steps">
-<li data-rv><span class="h-step-n">01</span><h3 data-i18n="t_v7_p1t">Free consultation</h3><p data-i18n="t_v7_p1b">We learn your goals and tell you honestly what you need, and what you don't.</p></li>
-<li data-rv><span class="h-step-n">02</span><h3 data-i18n="t_v7_p2t">Clear proposal</h3><p data-i18n="t_v7_p2b">Scope, price and timeline in writing, agreed before any work starts.</p></li>
-<li data-rv><span class="h-step-n">03</span><h3 data-i18n="t_v7_p3t">Design you see live</h3><p data-i18n="t_v7_p3b">You review the design with us and shape it before a line of code is written.</p></li>
-<li data-rv><span class="h-step-n">04</span><h3 data-i18n="t_v7_p4t">Build, launch, support</h3><p data-i18n="t_v7_p4b">We build, test and launch, then stay with you after the site goes live.</p></li>
-</ol>
-<p class="h-note" data-rv data-i18n="t_v7_proc_note">Timelines depend on scope, complexity and requirements. You get a clear proposal and scope of work before we start.</p>
-</div>
+<!-- SERVICES -->
+<section class="v9-sec v9-svc" id="services">
+  <div class="container">
+    <div class="v9-head" data-rv>
+      <span class="v9-eyebrow" data-i18n="t_v9_sv_eyebrow">What we do</span>
+      <h2 data-i18n="t_v9_sv_title">Everything your business needs online.</h2>
+    </div>
+    <ol class="v9-svc__list">
+      <li data-rv><a href="services.html#web-design"><small>01</small><h3 data-i18n="t_v9_sv1">Websites &amp; landing pages</h3><p data-i18n="t_v9_sv1_d">Company sites and landing pages that explain what you do in seconds and turn visits into messages.</p><b class="v9-svc__go"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></b></a></li>
+      <li data-rv><a href="services.html#ecommerce"><small>02</small><h3 data-i18n="t_v9_sv2">Online stores</h3><p data-i18n="t_v9_sv2_d">Stores with products, cart, checkout and an easy dashboard to manage orders.</p><b class="v9-svc__go"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></b></a></li>
+      <li data-rv><a href="services.html#web-development"><small>03</small><h3 data-i18n="t_v9_sv3">Web systems &amp; dashboards</h3><p data-i18n="t_v9_sv3_d">Booking systems, admin panels and custom tools built on a real database.</p><b class="v9-svc__go"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></b></a></li>
+      <li data-rv><a href="services.html#web-design"><small>04</small><h3 data-i18n="t_v9_sv4">UI/UX design</h3><p data-i18n="t_v9_sv4_d">Interfaces designed for your customers first, in Arabic and English.</p><b class="v9-svc__go"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></b></a></li>
+      <li data-rv><a href="services.html#seo"><small>05</small><h3 data-i18n="t_v9_sv5">SEO &amp; speed</h3><p data-i18n="t_v9_sv5_d">Clean structure, fast loading and the basics Google looks for.</p><b class="v9-svc__go"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></b></a></li>
+      <li data-rv><a href="services.html#security"><small>06</small><h3 data-i18n="t_v9_sv6">Security &amp; care</h3><p data-i18n="t_v9_sv6_d">SSL, backups, updates and monitoring after launch.</p><b class="v9-svc__go"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></b></a></li>
+    </ol>
+  </div>
 </section>
 
-<!-- ============ 6. FAQ — the last doubts ============ -->
-<section class="h-section h-faq" id="faq">
-<div class="container h-faq-grid">
-<header class="h-head" data-rv>
-<p class="h-eyebrow" data-i18n="t_v7_faq_eyebrow">Questions</p>
-<h2 data-i18n="t_v7_faq_title">Before you ask.</h2>
-</header>
-<div class="faq-list">
-<details class="faq-item"><summary data-i18n="t_v2_faq_q1">What's actually included in the price?</summary><p data-i18n="t_v2_faq_a1">Every package includes the pages/build scope listed for that tier, a free live design session with unlimited revisions during that session, up to 3 working meetings (max 2 hours each) after that, and an official completion certificate on delivery. Nothing hidden, nothing added later without you agreeing to it first.</p></details>
-<details class="faq-item"><summary data-i18n="t_v2_faq_q2">How long does a project take?</summary><p data-i18n="t_v2_faq_a2">It depends on scope, complexity and requirements.</p></details>
-<details class="faq-item"><summary data-i18n="t_v2_faq_q3">Do you offer hosting and domains?</summary><p data-i18n="t_v2_faq_a3">Yes — we can handle hosting and domain setup end-to-end, or work with hosting you already have.</p></details>
-<details class="faq-item"><summary data-i18n="t_v2_faq_q5">What happens after launch?</summary><p data-i18n="t_v2_faq_a5">Every project includes a post-launch support window.</p></details>
-<details class="faq-item"><summary data-i18n="t_v2_faq_q6">Why choose a newer studio over an established agency?</summary><p data-i18n="t_v2_faq_a6">Because your project gets the founder directly, not a rotating account team.</p></details>
-</div>
-</div>
+<!-- PROCESS stacking cards -->
+<section class="v9-sec v9-ps" id="process">
+  <div class="container v9-ps__wrap">
+    <div class="v9-ps__aside">
+      <div class="v9-head" data-rv>
+        <span class="v9-eyebrow" data-i18n="t_v9_ps_eyebrow">How it works</span>
+        <h2 data-i18n="t_v9_ps_title">From first call to launch, in four steps.</h2>
+      </div>
+      <a class="v9-btn v9-btn--blue" href="book.html" data-rv><span data-i18n="t_v9_cta_book">Book a free consultation</span><b class="v9-btn__ic"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></b></a>
+    </div>
+    <div class="v9-ps__stack">
+      <article class="v9-ps__card"><span class="v9-ps__n">01</span><h3 data-i18n="t_v9_ps1">Free consultation</h3><p data-i18n="t_v9_ps1_d">A 30-minute call to understand what you need. You get a clear plan and price in writing.</p></article>
+      <article class="v9-ps__card"><span class="v9-ps__n">02</span><h3 data-i18n="t_v9_ps2">Design</h3><p data-i18n="t_v9_ps2_d">We design the key pages and review them with you until they feel right.</p></article>
+      <article class="v9-ps__card"><span class="v9-ps__n">03</span><h3 data-i18n="t_v9_ps3">Build</h3><p data-i18n="t_v9_ps3_d">We code it, connect everything and test it on every device.</p></article>
+      <article class="v9-ps__card"><span class="v9-ps__n">04</span><h3 data-i18n="t_v9_ps4">Launch &amp; care</h3><p data-i18n="t_v9_ps4_d">Your site goes live, and we stay with you for support and protection.</p></article>
+    </div>
+  </div>
 </section>
 
-<!-- ============ 7. CTA — the one next step ============ -->
-<section class="h-cta" id="start">
-<div class="h-cta-glow" aria-hidden="true"></div>
-<div class="container h-cta-inner" data-rv>
-<p class="h-eyebrow" data-i18n="t_v7_cta_eyebrow">Have a project in mind?</p>
-<h2 class="h-cta-title" data-i18n="t_v7_cta_title">Let's build it.</h2>
-<p class="h-cta-p" data-i18n="t_v7_cta_body">Book a free 30-minute consultation. No commitment, just a clear answer on what your business needs.</p>
-<div class="h-actions h-actions-center">
-<a class="btn btn-primary btn-lg" href="book.html" data-i18n="t_v7_cta_book_free">Book a free consultation</a>
-<a class="btn btn-outline btn-lg" href="https://wa.me/962799691748" target="_blank" rel="noopener" data-i18n="t_v2_whatsapp">Chat on WhatsApp</a>
-</div>
-<a class="h-mail" href="mailto:hello@velixweb.xyz">hello@velixweb.xyz</a>
-</div>
+<!-- TECH -->
+<section class="v9-sec v9-tech" id="stack">
+  <div class="container">
+    <div class="v9-head v9-head--center" data-rv>
+      <span class="v9-eyebrow" data-i18n="t_v9_tc_eyebrow">Our stack</span>
+      <h2 data-i18n="t_v9_tc_title">Modern tools for web and data.</h2>
+      <p data-i18n="t_v9_tc_sub">Frontend, backend and databases — chosen for each project, not out of habit.</p>
+    </div>
+  </div>
+  <div class="v9-tech__rows" dir="ltr" aria-label="Technologies">
+    <div class="v9-tech__row"><div class="v9-tech__track">
+      <span class="v9-chip"><i style="--c:#E34F26"></i>HTML5</span><span class="v9-chip"><i style="--c:#2965F1"></i>CSS3</span><span class="v9-chip"><i style="--c:#F7DF1E"></i>JavaScript</span><span class="v9-chip"><i style="--c:#3178C6"></i>TypeScript</span><span class="v9-chip"><i style="--c:#61DAFB"></i>React</span><span class="v9-chip"><i style="--c:#fff"></i>Next.js</span><span class="v9-chip"><i style="--c:#38BDF8"></i>Tailwind CSS</span><span class="v9-chip"><i style="--c:#88CE02"></i>GSAP</span>
+    </div></div>
+    <div class="v9-tech__row v9-tech__row--rev"><div class="v9-tech__track">
+      <span class="v9-chip"><i style="--c:#5FA04E"></i>Node.js</span><span class="v9-chip"><i style="--c:#4f78ff"></i>REST APIs</span><span class="v9-chip"><i style="--c:#4169E1"></i>PostgreSQL</span><span class="v9-chip"><i style="--c:#7FB3D5"></i>SQLite</span><span class="v9-chip"><i style="--c:#21759B"></i>WordPress</span><span class="v9-chip"><i style="--c:#FF4154"></i>TanStack Query</span><span class="v9-chip"><i style="--c:#fff"></i>Vercel</span><span class="v9-chip"><i style="--c:#aaa"></i>GitHub</span>
+    </div></div>
+  </div>
 </section>
+
+<!-- PRICING teaser -->
+<section class="v9-sec v9-price" id="pricing">
+  <div class="container">
+    <div class="v9-head" data-rv>
+      <span class="v9-eyebrow" data-i18n="t_v9_pc_eyebrow">Pricing</span>
+      <h2 data-i18n="t_v9_pc_title">Clear starting prices.</h2>
+      <p data-i18n="t_v9_pc_sub">The final price is confirmed in writing after the free consultation. 50% to start, 50% at launch.</p>
+    </div>
+    <div class="v9-price__grid">
+      <a class="v9-pcard" href="quote.html" data-rv><span class="v9-pcard__name" data-i18n="t_v9_pc1">Landing page</span><span class="v9-pcard__from" data-i18n="t_v9_pc_from">From</span><b class="v9-pcard__num">200 <small data-i18n="t_v9_jd">JD</small></b><p data-i18n="t_v9_pc1_d">One focused page that turns visitors into messages.</p><span class="v9-pcard__go"><span data-i18n="t_v9_pc_cta">Get a quote</span><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+      <a class="v9-pcard v9-pcard--hot" href="quote.html" data-rv><span class="v9-pcard__name" data-i18n="t_v9_pc2">Business website</span><span class="v9-pcard__from" data-i18n="t_v9_pc_from">From</span><b class="v9-pcard__num">350 <small data-i18n="t_v9_jd">JD</small></b><p data-i18n="t_v9_pc2_d">A multi-page company site with contact forms, ready to grow.</p><span class="v9-pcard__go"><span data-i18n="t_v9_pc_cta">Get a quote</span><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+      <a class="v9-pcard" href="quote.html" data-rv><span class="v9-pcard__name" data-i18n="t_v9_pc3">Online store</span><span class="v9-pcard__from" data-i18n="t_v9_pc_from">From</span><b class="v9-pcard__num">400 <small data-i18n="t_v9_jd">JD</small></b><p data-i18n="t_v9_pc3_d">Products, cart, orders and a dashboard to run it.</p><span class="v9-pcard__go"><span data-i18n="t_v9_pc_cta">Get a quote</span><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+    </div>
+  </div>
+</section>
+
+<!-- BIG CTA -->
+<section class="v9-cta" id="contact-cta">
+  <div class="v9-cta__bg" aria-hidden="true"><span class="v9-glow v9-glow--c"></span></div>
+  <div class="container v9-cta__inner">
+    <span class="v9-badge" data-rv><i></i><span data-i18n="t_v9_avail">Available for new projects</span></span>
+    <h2 class="v9-cta__title" data-rv><span data-i18n="t_v9_ct_a">Got an idea?</span><br/><span class="v9-blue" data-i18n="t_v9_ct_b">Let's build it.</span></h2>
+    <p data-rv data-i18n="t_v9_ct_sub">Tell us about your project. We reply within one business day.</p>
+    <div class="v9-cta__btns" data-rv>
+      <a class="v9-btn v9-btn--blue v9-btn--lg" href="book.html"><span data-i18n="t_v9_cta_book">Book a free consultation</span><b class="v9-btn__ic"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></b></a>
+      <a class="v9-btn v9-btn--wa v9-btn--lg" href="https://wa.me/962799691748" target="_blank" rel="noopener"><svg class="v9-wa" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.3-.5 0-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.3.5-.4.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z"/></svg><span data-i18n="t_v9_ct_wa">WhatsApp us</span></a>
+    </div>
+    <button class="v9-cta__ai" type="button" data-open-chat data-rv><span class="v9-cta__dot"></span><span data-i18n="t_v9_ct_ai">Or ask the VELIX assistant</span></button>
+  </div>
+</section>
+
 </main>
 <!-- ============================ FOOTER ============================ -->
 <footer class="site-footer">
@@ -336,7 +339,11 @@
 <script src="assets/js/script.js"></script>
 <script src="assets/js/image-loader.js"></script>
 <script src="assets/js/portfolio-render.js"></script>
+<script src="assets/js/config.js"></script>
 <script src="assets/js/chat-widget.js"></script>
+<script src="assets/vendor/gsap.min.js"></script>
+<script src="assets/vendor/ScrollTrigger.min.js"></script>
+<script src="assets/js/v9.js"></script>
 <script src="assets/js/home.js"></script>
 </body>
 </html>

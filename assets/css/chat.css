@@ -1,0 +1,63 @@
+/* VELIX chat assistant (v3) — loaded by chat-widget.js on every page */
+.velix-chat{display:none!important}
+.vc{--vc-bg:#0b0c10;--vc-panel:#101218;--vc-line:#ffffff17;--vc-ink:#f2f3f5;--vc-mute:#ffffff99;--vc-blue:#1D4EFF;--vc-blue2:#4f78ff;position:fixed;bottom:20px;inset-inline-end:20px;z-index:950;font-family:var(--sans,'Archivo',system-ui,sans-serif);color:var(--vc-ink)}
+html[lang="ar"] .vc{font-family:var(--ar-text,'IBM Plex Sans Arabic',system-ui,sans-serif)}
+.vc *{box-sizing:border-box}
+.vc-toggle{position:relative;width:60px;height:60px;border-radius:50%;border:0;cursor:pointer;background:var(--vc-blue);color:#fff;display:grid;place-items:center;box-shadow:0 14px 34px #1D4EFF66;transition:transform .25s}
+.vc-toggle:hover{transform:scale(1.06)}
+.vc-toggle svg{position:absolute;width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:opacity .2s,transform .3s}
+.vc-i-x{opacity:0;transform:rotate(-60deg)}
+.vc-toggle.is-open .vc-i-chat{opacity:0;transform:rotate(60deg)}.vc-toggle.is-open .vc-i-x{opacity:1;transform:none}
+.vc-toggle__ring{position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 0 #1D4EFF80;animation:vcPulse 2.6s infinite}
+.vc-toggle.is-open .vc-toggle__ring{animation:none}
+@keyframes vcPulse{0%{box-shadow:0 0 0 0 #1D4EFF70}70%{box-shadow:0 0 0 16px #1D4EFF00}100%{box-shadow:0 0 0 0 #1D4EFF00}}
+.vc-panel{position:absolute;bottom:76px;inset-inline-end:0;width:min(400px,calc(100vw - 32px));height:min(620px,calc(100vh - 120px));display:flex;flex-direction:column;background:var(--vc-panel);border-radius:24px;box-shadow:0 40px 90px #000b,0 0 0 1px var(--vc-line);overflow:hidden;opacity:0;transform:translateY(16px) scale(.97);transform-origin:bottom right;pointer-events:none;transition:opacity .25s,transform .3s cubic-bezier(.2,.8,.2,1)}
+.vc[dir="rtl"] .vc-panel{transform-origin:bottom left}
+.vc-panel.is-open{opacity:1;transform:none;pointer-events:auto}
+.vc-head{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--vc-line);background:linear-gradient(180deg,#1D4EFF1f,transparent)}
+.vc-avatar{width:40px;height:40px;border-radius:12px;background:var(--vc-blue);display:grid;place-items:center;font-weight:700;font-family:var(--sans,'Archivo',sans-serif)}
+.vc-who{flex:1;display:flex;flex-direction:column;line-height:1.3}
+.vc-name{font-size:15px}
+.vc-status{font-size:12px;color:var(--vc-mute);display:flex;align-items:center;gap:6px}
+.vc-status:before{content:'';width:7px;height:7px;border-radius:50%;background:#2ecc71;box-shadow:0 0 8px #2ecc71}
+.vc-close{width:34px;height:34px;border:0;border-radius:10px;background:#ffffff0d;color:var(--vc-ink);cursor:pointer;display:grid;place-items:center}
+.vc-close svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.vc-body{flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth;overscroll-behavior:contain}
+.vc-b{max-width:86%;padding:11px 14px;border-radius:18px;font-size:14.5px;line-height:1.65;word-wrap:break-word;animation:vcIn .3s ease}
+@keyframes vcIn{from{opacity:0;transform:translateY(6px)}}
+.vc-b--bot{align-self:flex-start;background:#ffffff0c;border:1px solid var(--vc-line);border-end-start-radius:6px}
+.vc-b--user{align-self:flex-end;background:var(--vc-blue);color:#fff;border-end-end-radius:6px}
+.vc-b ul{margin:6px 0;padding-inline-start:18px}
+.vc-b li{margin:2px 0}
+.vc-b a{color:var(--vc-blue2);text-decoration:underline}
+.vc-b--user a{color:#fff}
+.vc-typing{display:flex;gap:5px;padding:14px 16px}
+.vc-typing i{width:7px;height:7px;border-radius:50%;background:#ffffff80;animation:vcDot 1.2s infinite}
+.vc-typing i:nth-child(2){animation-delay:.15s}.vc-typing i:nth-child(3){animation-delay:.3s}
+@keyframes vcDot{0%,60%,100%{opacity:.3;transform:none}30%{opacity:1;transform:translateY(-4px)}}
+.vc-card{display:flex;flex-direction:column;gap:6px;min-width:240px}
+.vc-card__t{font-weight:700;font-size:15px;margin-bottom:4px}
+.vc-card__t small{font-weight:400;color:var(--vc-mute);font-size:11px;margin-inline-start:6px}
+.vc-row{display:flex;justify-content:space-between;gap:12px;font-size:13.5px;padding:7px 0;border-top:1px solid var(--vc-line)}
+.vc-row b{font-weight:600;white-space:nowrap}
+.vc-cta{display:block;text-align:center;margin-top:8px;padding:12px;border-radius:12px;background:#25D366;color:#06210f!important;font-weight:700;text-decoration:none!important}
+.vc-note{font-size:12px;color:var(--vc-mute);margin-top:4px}
+.vc-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.vc-act{padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;text-decoration:none!important;color:var(--vc-ink)!important;background:#ffffff10;border:1px solid var(--vc-line)}
+.vc-act--wa{background:#25D366;color:#06210f!important;border-color:transparent}
+.vc-quick{display:flex;gap:8px;padding:0 16px 10px;overflow-x:auto;scrollbar-width:none}
+.vc-quick::-webkit-scrollbar{display:none}
+.vc-chip{flex:none;padding:8px 14px;border-radius:999px;border:1px solid #1D4EFF66;background:#1D4EFF14;color:var(--vc-ink);font:inherit;font-size:13px;cursor:pointer;white-space:nowrap;transition:background .2s}
+.vc-chip:hover{background:#1D4EFF33}
+.vc-form{display:flex;gap:8px;padding:12px;border-top:1px solid var(--vc-line)}
+.vc-input{flex:1;min-width:0;height:46px;border-radius:14px;border:1px solid var(--vc-line);background:#ffffff08;color:var(--vc-ink);padding:0 14px;font:inherit;font-size:15px;outline:none}
+.vc-input:focus{border-color:var(--vc-blue2)}
+.vc-send{width:46px;height:46px;border:0;border-radius:14px;background:var(--vc-blue);color:#fff;cursor:pointer;display:grid;place-items:center;flex:none}
+.vc-send svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.vc[dir="rtl"] .vc-send svg{transform:scaleX(-1)}
+@media (max-width:560px){
+  .vc{bottom:16px;inset-inline-end:16px}
+  .vc-panel{position:fixed;inset:0;width:100%;height:100%;height:100dvh;border-radius:0;bottom:auto}
+  .vc-toggle.is-open{opacity:0;pointer-events:none}
+}
+@media (prefers-reduced-motion:reduce){.vc *{animation:none!important;transition:none!important}}
