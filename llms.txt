@@ -1,0 +1,23 @@
+# VELIX Web Solutions
+
+> VELIX Web Solutions (فيلكس) is a web design and development company based in Amman, Jordan. It designs and builds custom, bilingual Arabic/English company websites, landing pages, online stores and web systems for small and medium businesses in Jordan and the Gulf (Saudi Arabia, UAE, Qatar, Kuwait). Founder & CEO: Moatsm Abdeen, who has delivered 79+ projects since he started working in web development.
+
+Key facts:
+- Location: Amman, Jordan. Serves all of Jordan (Amman, Irbid, Zarqa, Aqaba) in person and the Gulf remotely.
+- Services: company websites, landing pages, e-commerce stores, booking systems and admin dashboards, UI/UX design, SEO and performance, website security and maintenance.
+- Languages: Arabic and English, with proper RTL/LTR layouts. Sites are custom-designed and hand-coded, not templates.
+- Starting prices: landing page from 200 JD, business website from 350 JD, online store from 400 JD. Final price is confirmed in writing after a free consultation; payment 50% at start, 50% at launch.
+- Timelines depend on scope, complexity and requirements; a written proposal and scope of work come before any work starts.
+- Contact: hello@velixweb.xyz, WhatsApp +962 79 969 1748, free consultation booking at https://velixweb.xyz/book.html
+
+## Main pages
+- [Home](https://velixweb.xyz/): overview, services, process and pricing
+- [Web design in Amman (Arabic)](https://velixweb.xyz/web-design-amman.html): تصميم مواقع في عمّان والأردن
+- [Web design company in Jordan (English)](https://velixweb.xyz/web-design-company-jordan.html)
+- [Online stores in Jordan (Arabic)](https://velixweb.xyz/online-store-jordan.html): تصميم متجر إلكتروني في الأردن
+- [Website cost in Jordan (Arabic)](https://velixweb.xyz/website-cost-jordan.html): كم سعر تصميم موقع في الأردن
+- [Services](https://velixweb.xyz/services.html)
+- [Portfolio](https://velixweb.xyz/portfolio.html)
+- [About](https://velixweb.xyz/about.html)
+- [Book a free consultation](https://velixweb.xyz/book.html)
+- [Contact](https://velixweb.xyz/contact.html)
