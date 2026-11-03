@@ -1,5 +1,38 @@
 [
   {
+    "id": "3a9e2646-2ad5-4e42-a455-f7c3ad1e15d1",
+    "slug": "rishfa",
+    "title": "rishfa",
+    "subtitle": "",
+    "client": "rishfa",
+    "category": "Café Website",
+    "location": "",
+    "completionDate": "2026-11-03",
+    "featured": true,
+    "published": true,
+    "websiteUrl": "https://rishfa.sbs/#top",
+    "description": "Design and development of a modern website for RISHFA Café, delivering a distinctive digital experience to showcase its menu, beverages, and products. Featuring an elegant and user-friendly interface, fully responsive design optimized for mobile phones, tablets, and desktops, with a strong focus on visual identity, accessibility, and seamless customer communication.",
+    "overview": "",
+    "challenge": "",
+    "solution": "",
+    "results": [],
+    "services": [],
+    "technologies": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "Responsive Web Design"
+    ],
+    "cover": "/uploads/projects/1793700329747-a538835bf07e90b3.jpg",
+    "gallery": [],
+    "seoTitle": "rishfa",
+    "seoDescription": "Design and development of a modern website for RISHFA Café, delivering a distinctive digital experience to showcase its menu, beverages, and products. Featuring an elegant and user-friendly interface, fully responsive design optimized for mobile phones, tablets, and desktops, with a strong focus on visual identity, accessibility, and seamless customer communication.",
+    "sortOrder": 0,
+    "createdAt": "2026-11-03T10:05:32.345Z",
+    "updatedAt": "2026-11-03T10:05:32.345Z",
+    "deletedAt": null
+  },
+  {
     "id": "e54043ca-fcb6-48fa-8df1-5e6f3c8e39fd",
     "slug": "ameed-coffee",
     "title": "Ameed Coffee",
