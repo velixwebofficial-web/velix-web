@@ -1,0 +1,13 @@
+# never upload these to Vercel
+.env
+.env.local
+.env.*.local
+data/
+*.db
+*.db-wal
+*.db-shm
+backups/
+node_modules/
+social/
+.git/
+*.bak
