@@ -187,7 +187,7 @@
     "category": "Landing Page",
     "location": "",
     "completionDate": "",
-    "featured": true,
+    "featured": false,
     "published": true,
     "websiteUrl": "https://jaml-bay.vercel.app",
     "description": "An Arabic, right-to-left marketing website for Jaml (جمل), a Jordanian food-delivery app, presenting how ordering works, app features, partner-restaurant information and FAQs.",
@@ -216,7 +216,7 @@
     "seoDescription": "An Arabic, right-to-left marketing website for Jaml (جمل), a Jordanian food-delivery app, presenting how ordering works, app features, partner-restaurant information and FAQs.",
     "sortOrder": 0,
     "createdAt": "2026-10-08T19:57:51.383Z",
-    "updatedAt": "2026-10-28T20:00:24.511Z",
+    "updatedAt": "2026-11-08T16:38:07.789Z",
     "deletedAt": null
   },
   {
