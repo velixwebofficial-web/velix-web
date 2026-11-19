@@ -1,6 +1,6 @@
 /* VELIX chat assistant (v3) — loaded by chat-widget.js on every page */
 .velix-chat{display:none!important}
-.vc{--vc-bg:#0b0c10;--vc-panel:#101218;--vc-line:#ffffff17;--vc-ink:#f2f3f5;--vc-mute:#ffffff99;--vc-blue:#1D4EFF;--vc-blue2:#4f78ff;position:fixed;bottom:20px;inset-inline-end:20px;z-index:950;font-family:var(--sans,'Archivo',system-ui,sans-serif);color:var(--vc-ink)}
+.vc{--vc-bg:#0b0c10;--vc-panel:#101218;--vc-line:#ffffff17;--vc-ink:#f2f3f5;--vc-mute:#ffffff99;--vc-blue:#E3101F;--vc-blue2:#FF4D57;position:fixed;bottom:20px;inset-inline-end:20px;z-index:950;font-family:var(--sans,'Archivo',system-ui,sans-serif);color:var(--vc-ink)}
 html[lang="ar"] .vc{font-family:var(--ar-text,'IBM Plex Sans Arabic',system-ui,sans-serif)}
 .vc *{box-sizing:border-box}
 .vc-toggle{position:relative;width:60px;height:60px;border-radius:50%;border:0;cursor:pointer;background:var(--vc-blue);color:#fff;display:grid;place-items:center;box-shadow:0 14px 34px #1D4EFF66;transition:transform .25s}

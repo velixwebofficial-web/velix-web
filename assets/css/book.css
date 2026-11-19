@@ -6,7 +6,7 @@
 
 .bk-hero { position: relative; overflow: hidden; padding: calc(var(--nav-h) + clamp(48px, 7vw, 96px)) 0 clamp(40px, 5vw, 64px); isolation: isolate; }
 .bk-glow { position: absolute; z-index: -1; top: -40%; inset-inline-end: -10%; width: min(900px, 120vw); aspect-ratio: 1; border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(29,78,255,.35), rgba(29,78,255,.08) 55%, transparent 72%); }
+  background: radial-gradient(closest-side, rgba(227,16,31,.35), rgba(227,16,31,.08) 55%, transparent 72%); }
 .bk-hero h1 { font-size: clamp(2.4rem, 5.4vw, 4.75rem); font-stretch: 118%; letter-spacing: -.04em; max-width: 12em; }
 html[lang="ar"] .bk-hero h1 { letter-spacing: 0; }
 .bk-hero .lede { margin-top: 20px; }
@@ -30,10 +30,10 @@ html[lang="ar"] .bk-hero h1 { letter-spacing: 0; }
 .bk-direct a:hover { text-decoration-color: var(--blue-hi); }
 
 /* Card */
-.bk-card { min-width: 0; background: #0B0C0F; border: 1px solid var(--rule); border-radius: 12px; padding: clamp(22px, 3vw, 40px); box-shadow: 0 40px 120px -40px rgba(29,78,255,.25); }
+.bk-card { min-width: 0; background: #0B0C0F; border: 1px solid var(--rule); border-radius: 12px; padding: clamp(22px, 3vw, 40px); box-shadow: 0 40px 120px -40px rgba(227,16,31,.25); }
 .bk-step { border: 0; padding: 0; margin: 0 0 30px; min-width: 0; }
 .bk-step legend { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 1.05rem; margin-bottom: 14px; padding: 0; }
-.bk-n { width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: .82rem; background: var(--blue-soft); color: var(--blue-hi); border: 1px solid rgba(61,104,255,.4); font-family: var(--sans); }
+.bk-n { width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: .82rem; background: var(--blue-soft); color: var(--blue-hi); border: 1px solid rgba(255,59,71,.4); font-family: var(--sans); }
 
 .bk-modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .bk-mode input, .bk-day input, .bk-slot input { position: absolute; opacity: 0; pointer-events: none; }
