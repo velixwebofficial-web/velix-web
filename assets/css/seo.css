@@ -25,7 +25,7 @@
 .seo-faq summary::after { content: '+'; color: var(--blue-2); font-size: 1.4rem; line-height: 1; }
 .seo-faq details[open] summary::after { content: '−'; }
 .seo-faq details div { margin-top: 12px; color: var(--on-black-soft); }
-.seo-cta { margin-top: 80px; padding: 40px; border-radius: var(--r-lg); background: linear-gradient(135deg, rgba(29,78,255,.22), rgba(29,78,255,.05)); border: 1px solid var(--rule-strong); text-align: center; }
+.seo-cta { margin-top: 80px; padding: 40px; border-radius: var(--r-lg); background: linear-gradient(135deg, rgba(227,16,31,.22), rgba(227,16,31,.05)); border: 1px solid var(--rule-strong); text-align: center; }
 .seo-cta p { color: var(--on-black-soft); max-width: 620px; margin: 0 auto 24px; }
 .seo-btns { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
 .seo-btns .btn { display: inline-flex; align-items: center; text-decoration: none; }

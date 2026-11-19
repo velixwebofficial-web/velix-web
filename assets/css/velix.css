@@ -715,10 +715,10 @@ html[lang="ar"] .velix-chat { font-family: var(--ar-text); }
    or "light" (glows in cinematic scenes). Everything else stays silver.
    ========================================================================== */
 :root {
-  --blue: #1D4EFF;
-  --blue-hi: #3D68FF;
-  --blue-glow: rgba(29, 78, 255, 0.45);
-  --blue-soft: rgba(29, 78, 255, 0.12);
+  --blue: #E3101F;
+  --blue-hi: #FF3B47;
+  --blue-glow: rgba(227,16,31, 0.45);
+  --blue-soft: rgba(227,16,31, 0.12);
 }
 ::selection { background: var(--blue); color: #fff; }
 :focus-visible { outline-color: var(--blue-hi); }
